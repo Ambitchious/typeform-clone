@@ -89,7 +89,9 @@ def detail(db: Session, form: Form) -> schemas.FormDetail:
 
 def create_form(db: Session, title: str) -> Form:
     theme = db.scalar(select(Theme).where(Theme.is_gallery).order_by(Theme.id))
-    form = Form(title=title, theme=theme, settings=DEFAULT_SETTINGS)
+    # Like Typeform, a new form starts without a welcome screen ("Add Welcome Screen" turns it on).
+    settings = {**DEFAULT_SETTINGS, "welcome": {**DEFAULT_SETTINGS["welcome"], "enabled": False}}
+    form = Form(title=title, theme=theme, settings=settings)
     db.add(form)
     db.commit()
     return form

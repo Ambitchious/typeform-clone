@@ -13,9 +13,10 @@ import { SettingsPanel } from "./SettingsPanel";
 import { TopBar, type Tab } from "./TopBar";
 import { useFormEditor } from "./useFormEditor";
 
-export function Builder({ initial, tab, focusQuestion }: { initial: FormDetail; tab: Tab; focusQuestion?: number }) {
+export function Builder({ initial, tab, focusQuestion, openAdd }: { initial: FormDetail; tab: Tab; focusQuestion?: number; openAdd?: boolean }) {
   const editor = useFormEditor(initial);
-  const [modal, setModal] = useState<"add" | "design" | "settings" | null>(null);
+  // "Start from scratch" lands here with the Add content dialog already open, as in Typeform.
+  const [modal, setModal] = useState<"add" | "design" | "settings" | null>(openAdd ? "add" : null);
   const [bulkFor, setBulkFor] = useState<number | null>(null);
   const [toDelete, setToDelete] = useState<Question | null>(null);
   const [designAnchor, setDesignAnchor] = useState<HTMLElement | null>(null);
@@ -46,7 +47,7 @@ export function Builder({ initial, tab, focusQuestion }: { initial: FormDetail; 
         {tab === "connect" && <ConnectPanel />}
       </div>
 
-      <AddContentModal open={modal === "add"} onClose={() => setModal(null)} onPick={add}
+      <AddContentModal open={modal === "add"} onClose={() => setModal(null)} onPick={add} empty={!editor.form.questions.length}
         onImport={(titles) => { setModal(null); editor.importQuestions(titles); }} />
       <DesignPanel open={modal === "design"} onClose={() => setModal(null)} editor={editor} anchor={designAnchor} />
       <FormSettingsModal open={modal === "settings"} onClose={() => setModal(null)} editor={editor} />

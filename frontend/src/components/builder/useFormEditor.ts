@@ -11,7 +11,7 @@ export type Selection = number | "welcome" | "end";
  *  feels instant) and are then confirmed by the server. */
 export function useFormEditor(initial: FormDetail) {
   const [form, setForm] = useState(initial);
-  const [selected, setSelected] = useState<Selection>(initial.questions[0]?.id ?? "welcome");
+  const [selected, setSelected] = useState<Selection>(initial.questions[0]?.id ?? (initial.settings.welcome.enabled ? "welcome" : "end"));
   const [pending, setPending] = useState(0);
   // Latest request number per question: a slow older save must not overwrite a newer edit.
   const seq = useRef(new Map<number, number>());

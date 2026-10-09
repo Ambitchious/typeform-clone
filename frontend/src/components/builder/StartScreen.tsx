@@ -9,7 +9,7 @@ import { Icon } from "../icons";
 /** What Typeform shows right after "Create form": an AI prompt, or start from scratch. */
 export function StartScreen({ form }: { form: Pick<FormDetail, "id" | "title"> }) {
   const router = useRouter();
-  const scratch = () => router.replace(`/forms/${form.id}/edit`);
+  const scratch = () => router.replace(`/forms/${form.id}/edit?add=1`);
   const soon = (what: string) => () => toast(`${what} is coming soon — start from scratch for now`);
 
   return (

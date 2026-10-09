@@ -18,8 +18,10 @@ const AI_TEMPLATES: [IconName, string, string, boolean][] = [
 ];
 
 /** Typeform's "Add content" dialog, measured at 1440px: 960px wide, 14px text, 36px rows. */
-export function AddContentModal({ open, onClose, onPick, onImport }: {
+export function AddContentModal({ open, onClose, onPick, onImport, empty }: {
   open: boolean; onClose: () => void; onPick: (e: Element) => void; onImport: (titles: string[]) => void;
+  /** An empty form recommends starting with a welcome screen, as Typeform does. */
+  empty?: boolean;
 }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>(TABS[0]);
   const [query, setQuery] = useState("");
@@ -55,7 +57,7 @@ export function AddContentModal({ open, onClose, onPick, onImport }: {
                 {!query && (
                   <>
                     <h3 className="mb-2 mt-6 px-2 text-[14px] font-medium">Recommended</h3>
-                    {RECOMMENDED.map((label) => ALL.find((e) => e.label === label)!).map((e) => (
+                    {(empty ? ["Welcome Screen"] : RECOMMENDED).map((label) => ALL.find((e) => e.label === label)!).map((e) => (
                       <SideButton key={e.label} onClick={() => pick(e)} icon={<Tile e={e} />} label={e.label} premium={e.premium} />
                     ))}
                     <h3 className="mb-2 mt-6 px-2 text-[14px] font-medium">Connect to apps</h3>
