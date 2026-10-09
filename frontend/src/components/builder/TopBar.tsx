@@ -59,7 +59,8 @@ export function TopBar({ form, tab, saving, onRename, onPublish }: Props) {
       </nav>
 
       <div className="flex h-full items-stretch" role="tablist">
-        {TABS.map((t) => (
+        {/* Like Typeform, Results appears once a form is live. */}
+        {TABS.filter((t) => t.id !== "results" || form.status === "published" || tab === "results").map((t) => (
           <Link key={t.id} href={t.href(form.id)} role="tab" aria-selected={tab === t.id}
             className={`relative flex items-center px-3 text-[15px] transition ${tab === t.id ? "text-ink" : "text-ink-2 hover:text-ink"}`}>
             {t.label}
@@ -75,6 +76,9 @@ export function TopBar({ form, tab, saving, onRename, onPublish }: Props) {
         ) : (
           <Button variant="primary" onClick={publish} disabled={!onPublish}>Publish</Button>
         )}
+        <a href="https://github.com/Ambitchious/typeform-clone#readme" target="_blank" rel="noreferrer" aria-label="Help" title="Help"
+          className="grid size-8 place-items-center rounded-lg text-ink-2 hover:bg-hover hover:text-ink"><Icon name="help" size={18} /></a>
+        <span className="grid size-8 place-items-center rounded-full bg-[#f2d6a2] text-[13px] font-semibold text-[#3c323e]" aria-label="Account">SG</span>
       </div>
 
       <Modal open={shareOpen} onClose={() => setShareOpen(false)} title="Share your form" width={520}

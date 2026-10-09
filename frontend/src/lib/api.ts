@@ -62,6 +62,7 @@ export const api = {
 
   themes: () => request<Theme[]>("/api/themes"),
   createTheme: (data: Omit<Theme, "id" | "is_gallery">) => request<Theme>("/api/themes", json("POST", data)),
+  deleteTheme: (id: number) => request<void>(`/api/themes/${id}`, { method: "DELETE" }),
   updateTheme: (id: number, data: Omit<Theme, "id" | "is_gallery">) => request<Theme>(`/api/themes/${id}`, json("PUT", data)),
 
   summary: (formId: number) => request<Summary>(`/api/forms/${formId}/summary`),

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
 import { isEmpty, nextIndex } from "@/lib/logic";
-import { themeVars } from "@/lib/theme";
+import { themeClass, themeVars } from "@/lib/theme";
 import type { AnswerValue, Answers, PublicForm } from "@/lib/types";
 import { validate } from "@/lib/validate";
 import { Icon } from "../icons";
@@ -234,7 +234,7 @@ export function FormRunner({ form, preview = false }: Props) {
   const error = question ? state.errors[question.id] : undefined;
 
   return (
-    <div className="tf relative flex h-full w-full flex-col overflow-hidden" style={themeVars(form.theme)} onWheel={onWheel}>
+    <div className={`${themeClass(form.theme)} relative flex h-full w-full flex-col overflow-hidden`} style={themeVars(form.theme)} onWheel={onWheel}>
       {settings.show_progress && state.screen === "question" && (
         <div className="absolute inset-x-0 top-0 z-10 flex gap-1 px-1.5 pt-1" aria-hidden>
           <div className="h-[3px] rounded-full transition-[width] duration-200 ease-in-out" style={{ width: `${(answered / questions.length) * 100}%`, background: "var(--tf-q)" }} />
@@ -245,12 +245,12 @@ export function FormRunner({ form, preview = false }: Props) {
       <AnimatePresence mode="wait" custom={state.dir} initial={false} onExitComplete={() => { lockUntil.current = 0; }}>
         {state.screen === "welcome" && (
           <motion.section key="welcome" custom={1} variants={slide} initial="enter" animate="center" exit="exit"
-            className="flex flex-1 flex-col items-center justify-center px-6 pb-24 text-center sm:pb-0">
-            <motion.h1 variants={part} className="max-w-[720px] text-[28px] leading-tight sm:text-[36px]">{settings.welcome.title || form.title}</motion.h1>
+            className="tf-w flex flex-1 flex-col justify-center px-6 pb-24 sm:px-16 sm:pb-0">
+            <motion.h1 variants={part} className="tf-w-title max-w-[720px]">{settings.welcome.title || form.title}</motion.h1>
             {settings.welcome.description && (
               <motion.p variants={part} className="mt-3 max-w-[640px] text-[18px] sm:text-[20px]" style={{ color: "var(--tf-q-soft)" }}>{settings.welcome.description}</motion.p>
             )}
-            <motion.div variants={part} className="mt-8 flex flex-col items-center gap-3 max-sm:fixed max-sm:inset-x-4 max-sm:bottom-6">
+            <motion.div variants={part} className="mt-8 flex flex-col items-[var(--tf-w-items)] gap-3 max-sm:fixed max-sm:inset-x-4 max-sm:bottom-6">
               <button type="button" className="tf-btn max-sm:w-full max-sm:justify-center" onClick={start}>{settings.welcome.button || "Start"}</button>
               {settings.welcome.show_time && (
                 <span className="flex items-center gap-1.5 text-[14px] max-sm:order-first" style={{ color: "var(--tf-q-soft)" }}>
@@ -271,7 +271,7 @@ export function FormRunner({ form, preview = false }: Props) {
               </motion.div>
               <motion.div variants={part} className="mt-6">
                 {error && <p role="alert" className="tf-error mb-5"><Icon name="warning" size={15} />{error}</p>}
-                <div className="flex items-center gap-3 max-sm:fixed max-sm:inset-x-4 max-sm:bottom-6 max-sm:z-10">
+                <div className="tf-q-actions flex items-center gap-3 max-sm:fixed max-sm:inset-x-4 max-sm:bottom-6 max-sm:z-10">
                     <button type="button" onClick={goNext} disabled={state.submitting}
                       className="tf-btn max-sm:w-full max-sm:justify-center">
                       {isLast ? (state.submitting ? "Submitting…" : "Submit") : <>OK <Icon name="check" size={18} strokeWidth={2.5} /></>}
@@ -289,8 +289,8 @@ export function FormRunner({ form, preview = false }: Props) {
 
         {state.screen === "done" && (
           <motion.section key="done" custom={1} variants={slide} initial="enter" animate="center" exit="exit"
-            className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <motion.h1 variants={part} className="max-w-[720px] text-[28px] leading-tight sm:text-[36px]">{settings.thank_you.title}</motion.h1>
+            className="tf-w flex flex-1 flex-col justify-center px-6 sm:px-16">
+            <motion.h1 variants={part} className="tf-w-title max-w-[720px]">{settings.thank_you.title}</motion.h1>
             {settings.thank_you.description && (
               <motion.p variants={part} className="mt-3 max-w-[640px] text-[18px] sm:text-[20px]" style={{ color: "var(--tf-q-soft)" }}>{settings.thank_you.description}</motion.p>
             )}

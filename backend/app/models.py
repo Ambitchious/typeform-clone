@@ -40,6 +40,10 @@ class Theme(Base):
     background_color: Mapped[str] = mapped_column(String(9))
     background_image_url: Mapped[str | None] = mapped_column(String(500))
     corner_radius: Mapped[str] = mapped_column(String(10), default="rounded")  # square | rounded | pill
+    welcome_size: Mapped[str] = mapped_column(String(2), default="sm")  # sm | md | lg, also used by endings
+    welcome_align: Mapped[str] = mapped_column(String(6), default="center")  # left | center
+    question_size: Mapped[str] = mapped_column(String(2), default="md")
+    question_align: Mapped[str] = mapped_column(String(6), default="left")
 
 
 class Form(Base):

@@ -67,6 +67,13 @@ body {
   --tf-a-fill-hover: color-mix(in srgb, var(--tf-a) 20%, transparent);
   --tf-a-line: color-mix(in srgb, var(--tf-a) 30%, transparent);
 }
+.tf-q-center .tf-q { text-align: center; }
+.tf-q-center .tf-q-num { position: static; display: inline-grid; margin: 0 10px 0 0; vertical-align: 0.35em; }
+.tf-q-center .tf-q-actions { justify-content: center; }
+.tf-q-title { font-size: var(--tf-q-size); line-height: 1.3; }
+.tf-w { text-align: var(--tf-w-align); align-items: var(--tf-w-items); }
+.tf-w-title { font-size: var(--tf-w-size); line-height: 1.2; }
+.tf-q textarea, .tf-w textarea { text-align: inherit; }
 .tf-input {
   width: 100%;
   background: transparent;
@@ -145,3 +152,4 @@ body {
 
 @keyframes blink { 0%, 100% { opacity: 1 } 25%, 75% { opacity: 0.35 } 50% { opacity: 1 } }
 .tf-blink { animation: blink 0.45s ease-in-out; }
+.tf-q-center .tf-input { text-align: center; }

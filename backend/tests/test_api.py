@@ -165,3 +165,14 @@ def test_gallery_themes_are_read_only_and_settings_merge(client):
     before = client.get(f"/api/forms/{form_id}").json()["settings"]
     after = client.patch(f"/api/forms/{form_id}", json={"settings": {"show_progress": False}}).json()["settings"]
     assert after == {**before, "show_progress": False}
+
+
+def test_custom_theme_lifecycle(client):
+    base = {k: v for k, v in client.get("/api/themes").json()[0].items() if k not in ("id", "is_gallery")}
+    theme = client.post("/api/themes", json={**base, "name": "Mine", "question_align": "center"}).json()
+    assert theme["question_align"] == "center" and theme["welcome_size"] == "sm"
+    form_id = cafe(client)["id"]
+    client.patch(f"/api/forms/{form_id}", json={"theme_id": theme["id"]})
+    assert client.delete(f"/api/themes/{theme['id']}").status_code == 409
+    client.patch(f"/api/forms/{form_id}", json={"theme_id": client.get("/api/themes").json()[0]["id"]})
+    assert client.delete(f"/api/themes/{theme['id']}").status_code == 204

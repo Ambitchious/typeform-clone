@@ -16,6 +16,10 @@ export interface Theme {
   background_color: string;
   background_image_url: string | null;
   corner_radius: "square" | "rounded" | "pill";
+  welcome_size: "sm" | "md" | "lg";
+  welcome_align: "left" | "center";
+  question_size: "sm" | "md" | "lg";
+  question_align: "left" | "center";
 }
 
 export interface Option { id: number; label: string; position: number }

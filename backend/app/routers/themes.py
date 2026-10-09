@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from .. import schemas
@@ -21,3 +21,9 @@ def create_theme(data: schemas.ThemeIn, db: Session = Depends(get_db)):
 @router.put("/{theme_id}", response_model=schemas.ThemeOut)
 def update_theme(theme_id: int, data: schemas.ThemeIn, db: Session = Depends(get_db)):
     return svc.update_theme(db, theme_id, data)
+
+
+@router.delete("/{theme_id}", status_code=204)
+def delete_theme(theme_id: int, db: Session = Depends(get_db)):
+    svc.delete_theme(db, theme_id)
+    return Response(status_code=204)

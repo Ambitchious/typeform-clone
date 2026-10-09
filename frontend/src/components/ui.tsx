@@ -92,27 +92,30 @@ export function Modal({ open, onClose, title, children, footer, width = 440 }: {
 export interface MenuItem { label: string; icon?: IconName; onClick: () => void; danger?: boolean; divider?: boolean }
 
 export function Menu({ items, trigger, align = "right" }: { items: MenuItem[]; trigger: (open: () => void) => ReactNode; align?: "left" | "right" }) {
-  const [open, setOpen] = useState(false);
+  // Fixed positioning lets the menu escape scrolling panels instead of being clipped by them.
+  const [at, setAt] = useState<DOMRect | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    if (!at) return;
+    const close = (e: Event) => !ref.current?.contains(e.target as Node) && setAt(null);
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setAt(null);
     document.addEventListener("mousedown", close);
+    document.addEventListener("scroll", close, true);
     window.addEventListener("keydown", esc);
-    return () => { document.removeEventListener("mousedown", close); window.removeEventListener("keydown", esc); };
-  }, [open]);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("scroll", close, true); window.removeEventListener("keydown", esc); };
+  }, [at]);
   return (
     <div ref={ref} className="relative">
-      {trigger(() => setOpen((o) => !o))}
+      {trigger(() => setAt((a) => (a ? null : ref.current!.getBoundingClientRect())))}
       <AnimatePresence>
-        {open && (
+        {at && (
           <motion.div role="menu" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}
-            className={`absolute z-40 mt-1 min-w-[200px] rounded-xl border border-line bg-surface p-1.5 shadow-xl ${align === "right" ? "right-0" : "left-0"}`}>
+            style={{ top: at.bottom + 4, ...(align === "right" ? { right: window.innerWidth - at.right } : { left: at.left }) }}
+            className="fixed z-[60] min-w-[200px] rounded-xl border border-line bg-surface p-1.5 shadow-xl">
             {items.map((item) => (
               <div key={item.label}>
                 {item.divider && <hr className="my-1.5 border-line" />}
-                <button type="button" role="menuitem" onClick={() => { setOpen(false); item.onClick(); }}
+                <button type="button" role="menuitem" onClick={() => { setAt(null); item.onClick(); }}
                   className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[14px] hover:bg-hover ${item.danger ? "text-[#c4381c]" : "text-ink"}`}>
                   {item.icon && <Icon name={item.icon} size={16} />}{item.label}
                 </button>
@@ -122,6 +125,15 @@ export function Menu({ items, trigger, align = "right" }: { items: MenuItem[]; t
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/** Typeform's green diamond, marking features that need a paid plan. */
+export function PremiumBadge() {
+  return (
+    <span title="Paid feature" className="grid size-[22px] place-items-center rounded-full bg-[#dff2e9] text-[#0b6e4f]">
+      <Icon name="diamond" size={13} />
+    </span>
   );
 }
 

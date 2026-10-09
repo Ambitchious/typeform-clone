@@ -6,6 +6,7 @@ import {
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useId } from "react";
+import { toast } from "sonner";
 import type { Question } from "@/lib/types";
 import { Icon } from "../icons";
 import { Menu, TypeTile } from "../ui";
@@ -33,20 +34,22 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
     reorder(arrayMove(ids, ids.indexOf(Number(active.id)), ids.indexOf(Number(over.id))));
   };
 
+  const enableWelcome = () => { updateForm({ settings: { welcome: { ...form.settings.welcome, enabled: true } } }); setSelected("welcome"); };
+
   return (
     <aside className="flex w-[264px] shrink-0 flex-col gap-3 overflow-hidden" aria-label="Form pages">
+      <button type="button" onClick={() => toast("Other form modes are coming soon")}
+        className="flex h-12 shrink-0 items-center gap-2 rounded-xl bg-panel px-4 text-[14px] text-ink-2 hover:text-ink">
+        <Icon name="layers" size={16} /> Universal mode <Icon name="down" size={16} className="ml-auto" />
+      </button>
+
       <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-panel p-3">
         <h2 className="px-2 pb-2 pt-1 text-[15px] font-medium text-ink">Pages</h2>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {form.settings.welcome.enabled ? (
+          {form.settings.welcome.enabled && (
             <Row active={selected === "welcome"} onClick={() => setSelected("welcome")}
               tile={<span className="inline-flex h-6 items-center rounded-md bg-tile-screen px-1.5 text-[#3c323e]"><Icon name="welcome" size={15} /></span>}
               title={form.settings.welcome.title || "Welcome screen"} />
-          ) : (
-            <button type="button" onClick={() => { updateForm({ settings: { welcome: { ...form.settings.welcome, enabled: true } } }); setSelected("welcome"); }}
-              className="mb-1 flex w-full items-center justify-between rounded-lg border border-dashed border-line px-3 py-2 text-[13px] text-ink-2 hover:bg-hover">
-              Add Welcome Screen <Icon name="plus" size={15} />
-            </button>
           )}
           <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={form.questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
@@ -63,13 +66,36 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
             <Icon name="plus" size={15} /> Add content
           </button>
         </div>
+        {!form.settings.welcome.enabled && (
+          <button type="button" onClick={enableWelcome}
+            className="mt-2 flex w-full shrink-0 items-center gap-2 rounded-xl border border-dashed border-line px-3 py-2.5 text-[14px] text-ink hover:bg-hover">
+            <Icon name="bulb" size={16} /> Add Welcome Screen
+            <span className="ml-auto grid size-7 place-items-center rounded-lg border border-line bg-surface"><Icon name="plus" size={15} /></span>
+          </button>
+        )}
       </section>
-      <section className="rounded-xl bg-panel p-3">
-        <h2 className="px-2 pb-2 pt-1 text-[15px] font-medium text-ink">Endings</h2>
+
+      <section className="shrink-0 rounded-xl bg-panel p-3">
+        <div className="flex items-center justify-between px-2 pb-2 pt-1">
+          <h2 className="text-[15px] font-medium text-ink">Endings</h2>
+          <button type="button" aria-label="Add ending" onClick={() => toast("Multiple endings are coming soon")}
+            className="grid size-8 place-items-center rounded-lg border border-line bg-surface text-ink-2 hover:text-ink">
+            <Icon name="plus" size={16} />
+          </button>
+        </div>
         <Row active={selected === "end"} onClick={() => setSelected("end")}
-          tile={<span className="inline-flex h-6 items-center rounded-md bg-tile-screen px-1.5 text-[#3c323e]"><Icon name="end" size={15} /></span>}
+          tile={<span className="inline-flex h-6 items-center gap-1 rounded-md bg-tile-screen px-1.5 text-[12px] text-[#3c323e]"><Icon name="end" size={15} />A</span>}
           title={form.settings.thank_you.title || "Thank you screen"} />
       </section>
+
+      <form className="shrink-0 rounded-xl bg-panel p-2" onSubmit={(e) => { e.preventDefault(); toast("Typeform AI is coming soon"); }}>
+        <div className="flex h-12 items-center gap-2 rounded-lg border border-[#c9b6e4] bg-surface px-3 shadow-[0_0_0_3px_#efe7fa]">
+          <Icon name="mic" size={17} className="text-ink-2" />
+          <span className="h-5 w-px bg-line" />
+          <input placeholder="Ask Typeform AI" aria-label="Ask Typeform AI" className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink-2" />
+          <button type="submit" aria-label="Send" className="grid size-7 place-items-center rounded-md border border-line text-ink-3"><Icon name="send" size={13} /></button>
+        </div>
+      </form>
     </aside>
   );
 }

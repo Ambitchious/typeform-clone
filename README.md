@@ -37,7 +37,7 @@
 | **Form management** | Dashboard with list and grid views, search and sort. Create, rename, duplicate and delete forms. Publish to a random, unguessable link, or unpublish. Toasts confirm each action. |
 | **Results** | Views, starts, submissions, completion rate and average time to complete. Each question gets a summary (bars, averages, latest answers). There is also a paginated responses table with filters for completed, partial or all responses, plus CSV export and a "Generate test response" button. |
 
-**Every bonus feature is done:** logic jumps · custom themes and a theme editor (6 fonts, colours, background image, corner style) with a 6-theme gallery · CSV export · partial responses and completion rate · file upload · dark mode for the admin side.
+**Every bonus feature is done:** logic jumps · custom themes with Typeform's tabbed theme editor (font, title size and alignment, colours, corner radius, background image) with a 6-theme gallery · CSV export · partial responses and completion rate · file upload · dark mode for the admin side.
 
 **Matched to the real thing.** I measured the following on live Typeform forms and in the Typeform builder, then reproduced them:
 
@@ -254,7 +254,7 @@ backend/app/
 | POST | `/api/forms/{id}/questions` | Add a question (optionally after another) |
 | PUT | `/api/forms/{id}/questions/order` | Save drag-and-drop order (`409` if it doesn't list exactly the current questions) |
 | PATCH · DELETE | `/api/questions/{id}` | Edit fields, options (diffed by id) and logic · soft-delete if answered |
-| GET · POST · PUT | `/api/themes` · `/api/themes/{id}` | Gallery and custom themes |
+| GET · POST · PUT · DELETE | `/api/themes` · `/api/themes/{id}` | Gallery and custom themes (gallery ones are read-only; a theme in use can't be deleted) |
 | GET | `/api/forms/{id}/summary` | KPIs and per-question stats |
 | GET | `/api/forms/{id}/responses?status=&page=` | Paginated responses |
 | GET · DELETE | `/api/forms/{id}/responses/{rid}` | One response |
@@ -286,7 +286,7 @@ Status codes:
 | **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS 4, motion (animations), dnd-kit (drag and drop), sonner (toasts) |
 | **Backend** | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic 2 |
 | **Database** | SQLite |
-| **Tests** | pytest and FastAPI TestClient. 13 API tests cover validation, logic paths, option renames, partial responses, reorder, CSV injection and upload path tricks. |
+| **Tests** | pytest and FastAPI TestClient. 15 API tests cover validation, logic paths, option renames, partial responses, reorder, CSV injection and upload path tricks. |
 | **Hosting** | Vercel (web) and Render (API). `render.yaml` is a one-click blueprint. |
 
 ## Known limits and next steps

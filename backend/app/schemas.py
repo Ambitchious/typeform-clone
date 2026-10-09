@@ -23,6 +23,10 @@ class ThemeIn(BaseModel):
     background_color: str
     background_image_url: str | None = None
     corner_radius: Literal["square", "rounded", "pill"] = "rounded"
+    welcome_size: Literal["sm", "md", "lg"] = "sm"
+    welcome_align: Literal["left", "center"] = "center"
+    question_size: Literal["sm", "md", "lg"] = "md"
+    question_align: Literal["left", "center"] = "left"
 
 
 class ThemeOut(ThemeIn, ORM):

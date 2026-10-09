@@ -2,30 +2,51 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import type { Question, QuestionConfig, QuestionType } from "@/lib/types";
 import { Icon, type IconName } from "../icons";
 import { TYPES } from "../questions/registry";
-import { Toggle, TypeTile } from "../ui";
+import { Menu, PremiumBadge, Toggle, TypeTile } from "../ui";
 import type { Editor } from "./useFormEditor";
 
 export function SettingsPanel({ editor }: { editor: Editor }) {
   const { form, selected } = editor;
   const question = form.questions.find((q) => q.id === selected);
   return (
-    <aside className="flex w-[288px] shrink-0 flex-col gap-3 overflow-y-auto" aria-label="Settings">
-      <div className="rounded-xl bg-panel p-4">
+    <aside className="flex w-[264px] shrink-0 flex-col gap-3 overflow-y-auto" aria-label="Settings">
+      {question && (
+        <div className="rounded-xl bg-panel p-4">
+          <Label>Question <Icon name="help" size={14} className="text-ink-3" /></Label>
+          <div className="grid grid-cols-2 rounded-lg bg-hover p-0.5 text-[14px]" role="radiogroup" aria-label="Question format">
+            <button type="button" role="radio" aria-checked className="flex h-8 items-center justify-center gap-2 rounded-md bg-surface text-ink shadow-sm">
+              <Icon name="shortText" size={16} /> Text
+            </button>
+            <button type="button" role="radio" aria-checked={false} onClick={() => toast("Video questions are coming soon")}
+              className="flex h-8 items-center justify-center gap-2 rounded-md text-ink-2 hover:text-ink">
+              <Icon name="video" size={16} /> Video
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="flex-1 rounded-xl bg-panel p-4">
         {question && <QuestionSettings key={question.id} q={question} editor={editor} />}
         {selected === "welcome" && <WelcomeSettings editor={editor} />}
         {selected === "end" && <EndSettings editor={editor} />}
       </div>
       {question && (
-        <div className="flex items-center justify-between rounded-xl bg-panel p-4">
-          <span className="text-[15px] font-medium">Logic</span>
-          <Link href={`/forms/${form.id}/edit?tab=workflow&q=${question.id}`} className="flex items-center gap-1 text-[13px] text-ink-2 hover:text-ink">
-            {question.logic_rules.length ? `${question.logic_rules.length} rule${question.logic_rules.length > 1 ? "s" : ""}` : "Add"}
-            <Icon name="right" size={14} />
-          </Link>
-        </div>
+        <>
+          <div className="flex items-center justify-between rounded-xl bg-panel px-4 py-3">
+            <span className="text-[15px] font-medium">Logic</span>
+            <Link href={`/forms/${form.id}/edit?tab=workflow&q=${question.id}`} aria-label="Edit logic"
+              className="flex h-8 min-w-8 items-center justify-center gap-1 rounded-lg border border-line bg-surface px-2 text-[13px] text-ink-2 hover:text-ink">
+              {question.logic_rules.length > 0 && `${question.logic_rules.length} rule${question.logic_rules.length > 1 ? "s" : ""}`}
+              <Icon name={question.logic_rules.length ? "right" : "plus"} size={16} />
+            </Link>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl bg-panel px-4 py-3 text-[15px] font-medium">
+            Comments <PremiumBadge />
+          </div>
+        </>
       )}
     </aside>
   );
@@ -56,19 +77,22 @@ function QuestionSettings({ q, editor }: { q: Question; editor: Editor }) {
       )}
       {q.type === "rating" && (
         <div className="flex gap-2 pt-2">
-          <Select label="Steps" value={String(c.steps ?? 5)} onChange={(v) => set({ steps: Number(v) })}
-            options={Array.from({ length: 8 }, (_, i) => [String(i + 3), String(i + 3)] as [string, string])} />
+          <div className="relative flex-1">
+            <select value={String(c.steps ?? 5)} onChange={(e) => set({ steps: Number(e.target.value) })} aria-label="Steps"
+              className="h-9 w-full appearance-none rounded-lg border border-line bg-surface px-3 text-[14px] text-ink outline-none">
+              {Array.from({ length: 8 }, (_, i) => <option key={i}>{i + 3}</option>)}
+            </select>
+            <Icon name="down" size={16} className="pointer-events-none absolute right-2.5 top-2.5 text-ink-2" />
+          </div>
           <div className="flex-1">
-            <span className="mb-1 block text-[12px] text-ink-3">Shape</span>
-            <div className="flex gap-1" role="radiogroup" aria-label="Shape">
-              {(["star", "heart", "thumb", "circle"] as const).map((shape) => (
-                <button key={shape} type="button" role="radio" aria-checked={(c.shape ?? "star") === shape} aria-label={shape}
-                  onClick={() => set({ shape })}
-                  className={`grid size-9 place-items-center rounded-lg border ${(c.shape ?? "star") === shape ? "border-ink bg-surface" : "border-line hover:bg-hover"}`}>
-                  <Icon name={shape as IconName} size={18} />
-                </button>
-              ))}
-            </div>
+            <Menu align="right" items={(["star", "heart", "thumb", "circle"] as const).map((shape) => (
+              { label: shape[0].toUpperCase() + shape.slice(1), icon: shape as IconName, onClick: () => set({ shape }) }
+            ))} trigger={(open) => (
+              <button type="button" onClick={open} aria-label={`Shape: ${c.shape ?? "star"}`}
+                className="flex h-9 w-full items-center justify-between rounded-lg border border-line bg-surface px-3 text-ink">
+                <Icon name={(c.shape ?? "star") as IconName} size={18} /><Icon name="down" size={16} className="text-ink-2" />
+              </button>
+            )} />
           </div>
         </div>
       )}
@@ -84,6 +108,14 @@ function QuestionSettings({ q, editor }: { q: Question; editor: Editor }) {
       {["short_text", "long_text", "email", "number", "dropdown"].includes(q.type) && (
         <TextSetting label="Custom placeholder text" value={c.placeholder} onChange={(placeholder) => set({ placeholder })} />
       )}
+      <hr className="my-3 border-line" />
+      <div className="flex items-center justify-between text-[14px] text-ink">
+        Image or video
+        <button type="button" aria-label="Add image or video" onClick={() => toast("Images and videos on questions are coming soon")}
+          className="grid size-8 place-items-center rounded-lg border border-line bg-surface text-ink-2 hover:text-ink">
+          <Icon name="plus" size={16} />
+        </button>
+      </div>
     </>
   );
 }
@@ -129,7 +161,7 @@ function TypeSelect({ value, onChange }: { value: QuestionType; onChange: (t: Qu
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <h3 className="mb-2 text-[15px] font-medium text-ink">{children}</h3>;
+  return <h3 className="mb-2 flex items-center gap-1.5 text-[15px] font-medium text-ink">{children}</h3>;
 }
 
 function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {

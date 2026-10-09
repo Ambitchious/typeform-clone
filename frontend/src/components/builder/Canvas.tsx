@@ -1,25 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { themeVars } from "@/lib/theme";
+import { themeClass, themeVars } from "@/lib/theme";
 import type { PublicForm } from "@/lib/types";
-import { Icon } from "../icons";
+import { toast } from "sonner";
+import { Icon, type IconName } from "../icons";
 import { InlineText, QuestionView } from "../questions/QuestionView";
 import { FormRunner } from "../respondent/FormRunner";
 import { Button, IconButton } from "../ui";
 import type { Editor } from "./useFormEditor";
 
+const SOON_TOOLS: [IconName, string][] = [["accessibility", "Check accessibility"], ["history", "Version History"], ["translate", "Translations"]];
+
 interface Props {
   editor: Editor;
   onAdd: () => void;
-  onDesign: () => void;
+  onDesign: (anchor: HTMLElement) => void;
   onSettings: () => void;
+  settingsOpen: boolean;
+  onToggleSettings: () => void;
   onBulkChoices: (questionId: number) => void;
 }
 
 /** The centre of the builder: the selected block drawn with the real respondent components,
  *  in the form's theme, and edited in place. */
-export function Canvas({ editor, onAdd, onDesign, onSettings, onBulkChoices }: Props) {
+export function Canvas({ editor, onAdd, onDesign, onSettings, settingsOpen, onToggleSettings, onBulkChoices }: Props) {
   const { form, selected, patchQuestion, updateForm } = editor;
   const [mobile, setMobile] = useState(false);
   const [preview, setPreview] = useState<number | null>(null); // key: bump to restart
@@ -34,15 +39,21 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, onBulkChoices }: P
       <div className="flex items-center gap-1 rounded-xl bg-panel p-2">
         <Button variant="primary" icon="plus" onClick={onAdd}>Add content</Button>
         <span className="mx-1 h-5 w-px bg-line" />
-        <Button variant="ghost" icon="palette" onClick={onDesign}>Design</Button>
+        <Button variant="ghost" icon="palette" onClick={(e) => onDesign(e.currentTarget)}>Design</Button>
         <span className="mx-1 h-5 w-px bg-line" />
         <IconButton icon={mobile ? "desktop" : "phone"} label={mobile ? "Desktop view" : "Mobile view"} onClick={() => setMobile(!mobile)} />
         <IconButton icon="play" label="Preview" onClick={() => setPreview(Date.now())} disabled={!form.questions.length} />
+        <span className="mx-1 h-5 w-px bg-line" />
+        {SOON_TOOLS.map(([icon, label]) => (
+          <IconButton key={icon} icon={icon} label={label} onClick={() => toast(`${label} is coming soon`)} />
+        ))}
         <IconButton icon="settings" label="Form settings" onClick={onSettings} />
+        <IconButton icon="panel" label={settingsOpen ? "Hide settings panel" : "Show settings panel"} onClick={onToggleSettings}
+          className="ml-auto" aria-pressed={settingsOpen} />
       </div>
 
       <div className="grid min-h-0 flex-1 place-items-center overflow-hidden rounded-xl bg-panel p-4">
-        <div className={`tf relative flex h-full w-full overflow-y-auto rounded-lg shadow-sm ring-1 ring-line transition-[max-width] duration-300 ${mobile ? "max-w-[375px]" : "max-w-full"}`}
+        <div className={`${themeClass(form.theme)} relative flex h-full w-full overflow-y-auto rounded-lg shadow-sm ring-1 ring-line transition-[max-width] duration-300 ${mobile ? "max-w-[375px]" : "max-w-full"}`}
           style={themeVars(form.theme)}>
           <div className={`m-auto w-full max-w-[720px] py-16 ${mobile ? "px-6" : "px-14"}`}>
             {question && (
@@ -60,8 +71,8 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, onBulkChoices }: P
               </p>
             )}
             {selected === "welcome" && (
-              <div className="text-center">
-                <div className="text-[28px] leading-tight sm:text-[36px]">
+              <div className="tf-w flex flex-col">
+                <div className="tf-w-title">
                   <InlineText value={welcome.title} placeholder="Say hi! Recall information with @"
                     onCommit={(title) => updateForm({ settings: { welcome: { ...welcome, title } } })} />
                 </div>
@@ -69,13 +80,13 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, onBulkChoices }: P
                   <InlineText value={welcome.description} placeholder="Description (optional)"
                     onCommit={(description) => updateForm({ settings: { welcome: { ...welcome, description } } })} />
                 </div>
-                <span className="tf-btn mt-8">{welcome.button || "Start"}</span>
+                <span className="tf-btn mt-8 self-[var(--tf-w-items)]">{welcome.button || "Start"}</span>
                 {welcome.show_time && <p className="mt-3 text-[14px]" style={{ color: "var(--tf-q-soft)" }}>Takes X minutes</p>}
               </div>
             )}
             {selected === "end" && (
-              <div className="text-center">
-                <div className="text-[28px] leading-tight sm:text-[36px]">
+              <div className="tf-w flex flex-col">
+                <div className="tf-w-title">
                   <InlineText value={thank_you.title} placeholder="Thank you!"
                     onCommit={(title) => updateForm({ settings: { thank_you: { ...thank_you, title } } })} />
                 </div>
@@ -83,7 +94,7 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, onBulkChoices }: P
                   <InlineText value={thank_you.description} placeholder="Description (optional)"
                     onCommit={(description) => updateForm({ settings: { thank_you: { ...thank_you, description } } })} />
                 </div>
-                {thank_you.button && <span className="tf-btn mt-8">{thank_you.button}</span>}
+                {thank_you.button && <span className="tf-btn mt-8 self-[var(--tf-w-items)]">{thank_you.button}</span>}
               </div>
             )}
           </div>

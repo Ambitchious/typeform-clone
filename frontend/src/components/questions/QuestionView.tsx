@@ -40,15 +40,15 @@ export function QuestionView({ question, number, value, onChange = () => {}, onS
   // A question animating out keeps its last props; it must stop reacting to the keyboard at once.
   const isPresent = useIsPresent();
   return (
-    <div className="w-full">
+    <div className="tf-q w-full">
       <div className="relative">
         {number !== null && (
-          <span aria-hidden className="absolute -left-7 top-[0.45em] grid h-4 min-w-4 place-items-center rounded-[3px] px-[3px] text-[10px] font-bold max-sm:static max-sm:mb-3 max-sm:inline-grid"
+          <span aria-hidden className="tf-q-num absolute -left-7 top-[0.45em] grid h-4 min-w-4 place-items-center rounded-[3px] px-[3px] text-[10px] font-bold max-sm:static max-sm:mb-3 max-sm:inline-grid"
             style={{ background: "var(--tf-q)", color: "var(--tf-bg)" }}>
             {number}
           </span>
         )}
-        <h2 className="text-[22px] leading-[1.3] sm:text-[26px]">
+        <h2 className="tf-q-title">
           {edit ? (
             <InlineText value={question.title} onCommit={(v) => edit.setText("title", v)}
               placeholder="Your question here. Recall information with @" suffix={question.required ? "*" : ""} />
