@@ -1,12 +1,11 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response as HttpResponse
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
 
 from .. import schemas
 from ..db import get_db
-from ..models import Answer, Response
 from ..services import responses as svc
 from ..services import sample, stats
 from ..services.forms import get_form
@@ -38,19 +37,12 @@ def export_csv(form_id: int, db: Session = Depends(get_db)):
 
 @router.get("/responses/{response_id}", response_model=schemas.ResponseOut)
 def get_response(form_id: int, response_id: int, db: Session = Depends(get_db)):
-    response = db.get(Response, response_id, options=[selectinload(Response.answers).selectinload(Answer.question)])
-    if not response or response.form_id != form_id:
-        raise HTTPException(404, "Response not found")
-    return svc.serialize(response)
+    return svc.serialize(svc.get_response(db, get_form(db, form_id), response_id))
 
 
 @router.delete("/responses/{response_id}", status_code=204)
 def delete_response(form_id: int, response_id: int, db: Session = Depends(get_db)):
-    response = db.get(Response, response_id)
-    if not response or response.form_id != form_id:
-        raise HTTPException(404, "Response not found")
-    db.delete(response)
-    db.commit()
+    svc.delete_response(db, get_form(db, form_id), response_id)
     return HttpResponse(status_code=204)
 
 

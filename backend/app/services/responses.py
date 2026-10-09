@@ -11,7 +11,34 @@ from .. import schemas
 from ..logic import visible_path
 from ..models import Answer, Form, Question, Response, now
 from ..validators import AnswerError, validate_answer
-from .forms import live_questions
+from .forms import live_questions, serialize_question
+
+
+def get_published(db: Session, slug: str) -> Form:
+    form = db.scalar(select(Form).where(Form.slug == slug, Form.status == "published"))
+    if not form:
+        # Same 404 for "missing" and "draft", so outsiders can't probe for unpublished forms.
+        raise HTTPException(404, "This typeform isn't accepting responses")
+    return form
+
+
+def public_form(form: Form) -> schemas.PublicForm:
+    return schemas.PublicForm(
+        title=form.title, slug=form.slug, theme=form.theme, settings=form.settings,
+        questions=[serialize_question(q) for q in live_questions(form)],
+    )
+
+
+def count_view(db: Session, form: Form) -> None:
+    form.view_count += 1
+    db.commit()
+
+
+def live_question(form: Form, question_id: int) -> Question:
+    question = next((q for q in live_questions(form) if q.id == question_id), None)
+    if not question:
+        raise HTTPException(404, "Question not found")
+    return question
 
 
 def start(db: Session, form: Form) -> Response:
@@ -99,6 +126,18 @@ def serialize(response: Response) -> schemas.ResponseOut:
             for rows in ordered
         ],
     )
+
+
+def get_response(db: Session, form: Form, response_id: int) -> Response:
+    response = db.get(Response, response_id, options=[selectinload(Response.answers).selectinload(Answer.question)])
+    if not response or response.form_id != form.id:
+        raise HTTPException(404, "Response not found")
+    return response
+
+
+def delete_response(db: Session, form: Form, response_id: int) -> None:
+    db.delete(get_response(db, form, response_id))
+    db.commit()
 
 
 def list_responses(db: Session, form: Form, status: str, page: int, size: int) -> schemas.ResponsePage:

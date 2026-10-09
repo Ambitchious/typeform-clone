@@ -1,47 +1,199 @@
 # Typeform Clone
 
-A full-stack clone of [Typeform](https://www.typeform.com): build forms in a three-panel builder, publish them to a public link, collect answers through the one-question-at-a-time conversational flow, and analyse results.
+**Build a form, share a link, and watch the answers come in.** This is a full-stack clone of Typeform: the three-panel builder, the one-question-at-a-time form, logic jumps, themes and analytics.
 
-**Live demo:** https://typeform-clone-ochre-psi.vercel.app · **Try a form:** [Café Feedback](https://typeform-clone-ochre-psi.vercel.app/f/cafe-feedback) · [Tech Meetup RSVP](https://typeform-clone-ochre-psi.vercel.app/f/tech-meetup) · **API docs:** https://typeform-clone-api-okr0.onrender.com/docs
+**[Open the live app](https://typeform-clone-ochre-psi.vercel.app)** · **[Fill in a real form](https://typeform-clone-ochre-psi.vercel.app/f/cafe-feedback)** · **[API docs](https://typeform-clone-api-okr0.onrender.com/docs)**
 
-> The API runs on Render's free plan, which sleeps after 15 idle minutes and resets its disk on wake-up. A GitHub Action (`.github/workflows/keep-warm.yml`) pings it every 10 minutes to keep it awake and the data intact; if it does sleep, the first request takes up to a minute and the seeded demo forms are recreated. `render.yaml` documents the one-step switch to a paid plan with a persistent disk.
+![The builder: pages on the left, a live canvas in the middle, settings on the right](docs/screenshots/builder.jpg)
 
-## Features
+<table>
+  <tr>
+    <td><img src="docs/screenshots/rating.jpg" alt="Rating question in the Café Feedback form"></td>
+    <td><img src="docs/screenshots/choice.jpg" alt="Multiple choice question with two answers selected"></td>
+  </tr>
+</table>
 
-**Builder.** Three-panel layout (pages, live canvas, settings) like Typeform's. Question title, description and choices are edited in place on the canvas, which uses the same components respondents see, so the preview can't drift. Drag-and-drop reordering (mouse and keyboard), duplicate, delete with an answer-count warning, switch type in place, per-type settings (required, multiple selection with limit, randomize, alphabetical order, min/max number, max characters, placeholder, rating steps and shape). Welcome and thank-you screens are editable. Autosaves, with a "Saving… / Saved" indicator.
+> The API runs on Render's free plan. If nobody has used it for a while, the first page can take up to a minute to load while the server wakes up. A GitHub Action pings it every 10 minutes so this rarely happens.
 
-**Question types.** Short text, long text, multiple choice, dropdown (searchable), email, number, yes/no, rating, and file upload (bonus). Picture choice, payment and others appear as "Soon" in the add-content dialog.
+---
 
-**Respondent flow.** One question at a time, full screen. Transitions were measured frame by frame on a live Typeform: the outgoing question rises and fades in about 250 ms, and the incoming one settles on a spring from a slight blur, title first, then answers. Keyboard: Enter / ⌘↵ / ↑↓, letter keys for choices, Y/N for yes/no, digits for rating, Shift+Enter for new lines. Single-tap answers auto-advance after a selection blink. Progress bar, client and server validation with inline errors (`role="alert"`), welcome and thank-you screens, answers kept across a page refresh, and a mobile layout with a sticky OK button.
+## Try it in 60 seconds
 
-**Form management.** Dashboard with list and grid views, search, sorting, draft/published status, response count and completion rate. Create, rename (modal), duplicate, delete (confirmation), publish/unpublish with a shareable random link, and copy link. Toasts for every action.
+1. **[Fill in Café Feedback](https://typeform-clone-ochre-psi.vercel.app/f/cafe-feedback).** Use only the keyboard: <kbd>Enter</kbd> to continue, <kbd>A</kbd>–<kbd>E</kbd> to pick choices, <kbd>1</kbd>–<kbd>5</kbd> for stars.
+2. **Rate the coffee 1 or 2 stars, and then 4 or 5 on a second try.** A low rating opens "Sorry to hear that. What went wrong?". A high rating skips it. That is a logic jump.
+3. **Refresh halfway through.** Your answers are still there. The server has also saved them as a *partial response*.
+4. **[Open the dashboard](https://typeform-clone-ochre-psi.vercel.app)** → Café Feedback → **Results.** Your response is counted, and the completion rate shows the people who started but never finished.
+5. **Go to Workflow** and change the rule. Then go to **Content** and drag a question to a new position. Everything autosaves.
 
-**Results.** Performance KPIs (views, starts, submissions, completion rate, average time to complete), a per-question summary (bars with a count/% toggle, averages, latest text answers), a paginated responses table with completed/partial/all filters, a full-response drawer, delete, CSV export, and "Generate test response".
+---
 
-**Bonus.** Logic jumps (Workflow tab), custom themes with a theme editor (fonts, colours, background image, corner radius) plus a gallery of 6 themes, CSV export, partial-response tracking and completion rate, file upload, and dark mode for the admin UI.
+## What's in it
 
-**Placeholders (Coming soon).** Integrations (Connect tab), team collaboration, response limits, close dates, notifications.
-
-## Tech stack
-
-| Layer | Choice |
+| | |
 | --- | --- |
-| Frontend | Next.js 15 (App Router), TypeScript, Tailwind CSS 4, motion (animations), dnd-kit (drag and drop), sonner (toasts) |
-| Backend | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic 2 |
-| Database | SQLite (foreign keys enforced) |
-| Tests | pytest + FastAPI TestClient (12 API tests) |
-| Hosting | Vercel (frontend), Render (API + SQLite + uploads; free plan, persistent disk optional) |
+| **Builder** | Three panels like Typeform's: pages, a live canvas and settings. You edit titles and choices directly on the canvas. Drag to reorder (mouse or keyboard). Duplicate, delete with a warning when a question already has answers, change a question's type in place, and edit the welcome and thank-you screens. Changes autosave with a *Saving… / Saved* indicator. |
+| **9 question types** | Short text, long text, multiple choice (single or multi, with selection limit and randomise), searchable dropdown, email, number (min/max), yes/no, rating (stars, hearts, thumbs or circles; 3–10 steps) and file upload. |
+| **Respondent flow** | One question per screen, with a progress bar. There is a full keyboard model (<kbd>Enter</kbd>, <kbd>⌘</kbd><kbd>Enter</kbd>, <kbd>↑</kbd><kbd>↓</kbd>, letter keys, <kbd>Y</kbd>/<kbd>N</kbd>, digits, <kbd>Shift</kbd><kbd>Enter</kbd>). Single-tap answers auto-advance. Errors show inline. Answers survive a refresh, and the layout works on mobile. |
+| **Form management** | Dashboard with list and grid views, search and sort. Create, rename, duplicate and delete forms. Publish to a random, unguessable link, or unpublish. Toasts confirm each action. |
+| **Results** | Views, starts, submissions, completion rate and average time to complete. Each question gets a summary (bars, averages, latest answers). There is also a paginated responses table with filters for completed, partial or all responses, plus CSV export and a "Generate test response" button. |
 
-## Run locally
+**Every bonus feature is done:** logic jumps · custom themes and a theme editor (6 fonts, colours, background image, corner style) with a 6-theme gallery · CSV export · partial responses and completion rate · file upload · dark mode for the admin side.
+
+**Matched to the real thing.** I measured the following on live Typeform forms and in the Typeform builder, then reproduced them:
+
+- the keyboard shortcuts;
+- the 0.6 s auto-advance delay;
+- the transition (the old question rises and fades in about 250 ms, then the new one springs in from a light blur);
+- the progress bar;
+- the error-pill colours;
+- the admin colour tokens;
+- the colour given to each question type.
+
+<details>
+<summary><b>More screenshots</b>: dashboard, logic jumps, results, welcome screen</summary>
+
+| Dashboard | Logic jumps (Workflow tab) |
+| --- | --- |
+| ![Dashboard](docs/screenshots/dashboard.jpg) | ![Logic editor](docs/screenshots/logic.jpg) |
+| **Results** | **Per-question summary** |
+| ![Results KPIs](docs/screenshots/results.jpg) | ![Question summary](docs/screenshots/summary.jpg) |
+| **Welcome screen (Café theme)** | |
+| ![Welcome screen](docs/screenshots/welcome.jpg) | |
+
+</details>
+
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+    subgraph Browser["Next.js (Vercel)"]
+        B[Builder] --> QV
+        R[FormRunner<br/>welcome → questions → done] --> QV[Shared question components]
+        R --> L1[lib/logic.ts]
+    end
+    subgraph API["FastAPI (Render)"]
+        RT[Routers<br/>HTTP only] --> S[Services<br/>forms · responses · stats · themes]
+        S --> V[validators.py]
+        S --> L2[logic.py]
+    end
+    Browser -- "lib/api.ts (the only fetch layer)" --> RT
+    S --> DB[(SQLite)]
+```
+
+**The builder canvas and the public form render with the same components.** The preview can't drift from what respondents see, and adding a question type means one registry entry, one component and one validator.
+
+**What happens when someone submits:**
+
+1. The browser validates each answer as it is given, so feedback is instant.
+2. Each confirmed answer is autosaved to a partial response (`PUT …/answers/{qid}`). A secret token proves this browser started that response.
+3. On submit, the server **replays the logic rules** to work out which questions this person actually saw. It re-validates only those, drops answers to skipped questions and saves everything in one transaction.
+4. If anything is wrong, it returns `422 {"errors": {"<question id>": "message"}}`, and the form jumps back to the first broken question.
+
+Running the logic on the server is what lets a *required* question hidden by a jump stay out of the way of the submission.
+
+---
+
+## Database
+
+```mermaid
+erDiagram
+    themes ||--o{ forms : styles
+    forms ||--o{ questions : has
+    forms ||--o{ responses : collects
+    questions ||--o{ question_options : offers
+    questions ||--o{ logic_rules : "jumps from"
+    responses ||--o{ answers : contains
+    questions ||--o{ answers : "answered by"
+    question_options ||--o{ answers : "chosen in"
+
+    forms {
+        int id PK
+        string title
+        string slug UK "random, set on publish"
+        string status "draft | published"
+        json settings "welcome / thank-you screens"
+        int view_count
+    }
+    questions {
+        int id PK
+        int form_id FK
+        string type
+        string title
+        bool required
+        int position
+        json config "type-specific settings"
+        datetime deleted_at "soft delete"
+    }
+    question_options {
+        int id PK
+        int question_id FK
+        string label
+        int position
+        datetime deleted_at
+    }
+    logic_rules {
+        int id PK
+        int question_id FK
+        string operator "is | is_not | lt | gt | always"
+        string value
+        int option_id FK
+        int jump_to_question_id FK "null = end of form"
+    }
+    responses {
+        int id PK
+        int form_id FK
+        string token UK
+        string status "in_progress | completed"
+        datetime started_at
+        datetime completed_at
+    }
+    answers {
+        int id PK
+        int response_id FK
+        int question_id FK
+        int option_id FK "for choice answers"
+        text value
+    }
+```
+
+There are three choices worth explaining:
+
+- **An answer stores the option's *id*, not its text.** If you rename "Cold brew" to "Cold brew (oat)", the old answers still point at it and the charts stay correct. For multi-select, each chosen option gets its own row. `UNIQUE(response_id, question_id, option_id)` prevents duplicate rows, and per-question stats are a single `GROUP BY`.
+- **Questions and options with answers are soft-deleted.** Delete a question that 23 people answered, and their responses stay readable. The builder warns you before you do it.
+- **Columns hold what's shared, JSON holds what's type-specific.** Every question has a title, a required flag and a position, so those are columns. "Max characters" or "rating steps" belong to only one type, so they live in `config`. The alternative is a table per question type (9 tables and lots of joins) or MongoDB, which the brief rules out by fixing SQLite.
+
+Foreign keys are enforced (`PRAGMA foreign_keys=ON`), deletes cascade from forms and responses, and all times are stored in UTC.
+
+---
+
+## Design decisions
+
+| I chose | Over | Because |
+| --- | --- | --- |
+| Small autosave endpoints (one question, one reorder) | `PUT` the whole form | Overwriting the whole form recreates rows and orphans existing answers. A per-question sequence number also stops a slow, older save from overwriting a newer edit. |
+| Logic evaluated in **both** browser and server | Browser only | The browser needs it to navigate. The server needs it to know what was seen, and it shouldn't trust the browser. |
+| Forward-only logic jumps (validated, `422`) | Any jump | Backward jumps can create infinite loops. Reordering removes rules that would point backwards. |
+| A random 8-character public link | `/f/1` | Forms can't be enumerated. Drafts and missing forms return the same `404`. |
+| A token on partial responses | Response id only | Ids are guessable, so the token proves ownership. It's compared in constant time. |
+| Escaping CSV cells that start with `= + - @` | Raw values | Prevents formula injection when the export is opened in Excel. |
+| Routers that only handle HTTP | Logic in route handlers | Every rule lives in `services/` and is testable without HTTP. |
+
+**Assumptions.** There is a single creator account, since the brief puts authentication out of scope. Editing a published form affects future respondents only, and the builder says so when a question already has answers. Analytics count completed responses unless you filter for partial ones.
+
+---
+
+## Run it locally
 
 ```bash
-# API: http://localhost:8000 (interactive docs at /docs)
+# API → http://localhost:8000  (interactive docs at /docs)
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 
-# Web app: http://localhost:3000
+# Web → http://localhost:3000
 cd frontend
 npm install
 echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
@@ -51,101 +203,96 @@ npm run dev
 cd backend && pytest
 ```
 
-The database is created and seeded on first start: 6 gallery themes, two published forms ("Café Feedback" at `/f/cafe-feedback` and "Tech Meetup RSVP" at `/f/tech-meetup`) with realistic responses and logic jumps, and one draft. To reseed, delete `backend/typeform.db`.
+On first start, the database is created and seeded with 6 gallery themes and three forms:
 
-| Env var | Where | Default |
+- **Café Feedback**: 23 responses and a logic jump on the rating.
+- **Tech Meetup RSVP**: 14 responses. Answering "No" ends the form.
+- **Product Research Survey**: a draft.
+
+Delete `backend/typeform.db` to start fresh.
+
+| Env var | Used by | Default |
 | --- | --- | --- |
 | `DATABASE_URL` | API | `sqlite:///./typeform.db` |
 | `UPLOAD_DIR` | API | `./uploads` |
 | `CORS_ORIGINS` | API | `http://localhost:3000` (comma-separated) |
 | `NEXT_PUBLIC_API_URL` | Web | `http://localhost:8000` |
 
-## Architecture
+<details>
+<summary><b>Project layout</b></summary>
 
 ```
 frontend/src/
-  app/                       routes: / (dashboard), /forms/[id]/edit, /forms/[id]/results, /f/[slug] (public)
+  app/                    routes: / · /forms/[id]/edit · /forms/[id]/results · /f/[slug] (public, server-rendered)
   components/
-    questions/               ONE renderer per question type, used by both the builder canvas and the public form
-      registry.ts            type → label, icon, colour, auto-advance; adding a type = 1 entry + 1 body + 1 validator
-    respondent/FormRunner    reducer state machine: welcome → question[i] → done
-    builder/                 useFormEditor (all builder state + saves), PageList, Canvas, SettingsPanel, LogicEditor, …
-    dashboard/, results/, ui.tsx (admin primitives), icons.tsx
-  lib/                       api.ts (the only place that calls the API), types, logic.ts, validate.ts, theme.ts
+    questions/            one component per question type, shared by the builder canvas and the public form
+      registry.ts         type → label, icon, colour, auto-advance
+    respondent/           FormRunner: a reducer state machine (welcome → question[i] → done)
+    builder/              useFormEditor (all builder state and saves), PageList, Canvas, SettingsPanel, LogicEditor, DesignPanel
+    dashboard/, results/  the admin pages
+  lib/                    api.ts (the only place that calls the API), logic.ts, validate.ts, theme.ts, types.ts
 
 backend/app/
-  main.py                    app, CORS, create tables + seed on startup
-  db.py                      engine, session, PRAGMA foreign_keys=ON
-  models.py                  SQLAlchemy tables
-  schemas.py                 Pydantic request/response shapes
-  routers/                   HTTP only: parse, call a service, return a status code
-  services/                  the logic: forms (publish, duplicate, option diffing, reorder), responses, stats, sample data
-  validators.py              per-type answer validation registry
-  logic.py                   logic-jump evaluation (mirrored in frontend/src/lib/logic.ts)
+  routers/                HTTP only: parse the request, call a service, return a status code
+  services/               forms (publish, duplicate, option diffing, reorder) · responses · stats · themes · uploads · sample
+  models.py, schemas.py   SQLAlchemy tables, Pydantic request/response shapes
+  validators.py           per-type answer validation (a registry, like the frontend's)
+  logic.py                logic-jump evaluation (mirrors frontend/src/lib/logic.ts)
+  seed.py                 demo themes, forms and responses
 ```
 
-**Request flow for a submission.** The browser validates each answer as you go, for instant feedback. Each confirmed answer is autosaved to a partial response (`PUT …/answers/{qid}` with a secret token). On submit, the server replays the logic rules to work out which questions this respondent actually saw, re-validates only those (a required question hidden by a jump never blocks submission), and writes everything in one transaction. A 422 returns errors keyed by question id, and the form jumps back to the first failing question.
+</details>
 
-## Database schema
-
-```
-themes ──1:N── forms ──1:N── questions ──1:N── question_options
-                 │               │  └──1:N── logic_rules (→ jump_to question, → option)
-                 └──1:N── responses ──1:N── answers (→ question, → option)
-```
-
-| Table | Key columns | Notes |
-| --- | --- | --- |
-| `themes` | name, is_gallery, font, question/answer/button/button_text/background colours, background_image_url, corner_radius | Shared: editing a custom theme restyles every form using it |
-| `forms` | title, slug (unique), status, theme_id → themes, settings JSON, view_count, timestamps | Welcome/thank-you text and display toggles live in `settings`; response counts are computed, never stored |
-| `questions` | form_id → forms (cascade), type, title, description, required, position, config JSON, deleted_at | One table for every type; `config` holds type-specific settings. Index on (form_id, position) |
-| `question_options` | question_id → questions, label, position, deleted_at | Answers reference option **ids**, so renaming a choice keeps old answers |
-| `logic_rules` | question_id, operator (is / is_not / lt / gt / always), value, option_id, jump_to_question_id (null = end), position | First match wins; jumps are forward-only (validated) |
-| `responses` | form_id → forms (cascade), token, status (in_progress / completed), started_at, completed_at | Envelope per respondent; status powers partial responses and completion rate |
-| `answers` | response_id → responses (cascade), question_id, option_id, value TEXT | One row per answered question (one per selected option for multi-select). UNIQUE(response_id, question_id, option_id); index on question_id |
-
-## API overview
-
-Full interactive docs: `/docs` (OpenAPI).
+<details>
+<summary><b>API reference</b> (full interactive docs at <a href="https://typeform-clone-api-okr0.onrender.com/docs">/docs</a>)</summary>
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET / POST | `/api/forms` | List forms (with response and start counts) / create |
-| GET / PATCH / DELETE | `/api/forms/{id}` | Full form / rename, theme, settings / delete (cascades) |
-| POST | `/api/forms/{id}/duplicate`, `/publish`, `/unpublish` | Copy (questions, options, remapped logic) / generate slug + go live / take offline |
+| GET · POST | `/api/forms` | List forms with response counts · create |
+| GET · PATCH · DELETE | `/api/forms/{id}` | Full form · rename, theme, settings · delete |
+| POST | `/api/forms/{id}/duplicate` · `/publish` · `/unpublish` | Copy with remapped logic · go live · take offline |
 | POST | `/api/forms/{id}/questions` | Add a question (optionally after another) |
-| PUT | `/api/forms/{id}/questions/order` | Save drag-and-drop order (must list exactly the current questions, else 409) |
-| PATCH / DELETE | `/api/questions/{id}` | Edit fields, config, options (diffed by id), logic rules / soft-delete if answered |
-| GET / POST / PUT | `/api/themes`, `/api/themes/{id}` | Gallery + custom themes |
-| GET | `/api/forms/{id}/summary` | KPIs + per-question stats |
+| PUT | `/api/forms/{id}/questions/order` | Save drag-and-drop order (`409` if it doesn't list exactly the current questions) |
+| PATCH · DELETE | `/api/questions/{id}` | Edit fields, options (diffed by id) and logic · soft-delete if answered |
+| GET · POST · PUT | `/api/themes` · `/api/themes/{id}` | Gallery and custom themes |
+| GET | `/api/forms/{id}/summary` | KPIs and per-question stats |
 | GET | `/api/forms/{id}/responses?status=&page=` | Paginated responses |
-| GET / DELETE | `/api/forms/{id}/responses/{rid}` | One response |
+| GET · DELETE | `/api/forms/{id}/responses/{rid}` | One response |
 | GET | `/api/forms/{id}/responses/export.csv` | CSV export |
-| POST | `/api/forms/{id}/responses/generate` | Add a random valid test response |
-| GET | `/api/public/forms/{slug}` | Published form only (drafts and missing forms both 404) |
+| POST | `/api/forms/{id}/responses/generate` | Add a random valid response that follows the logic |
+| GET | `/api/public/forms/{slug}` | Published form only |
 | POST | `/api/public/forms/{slug}/view` | Count a view |
-| POST | `/api/public/forms/{slug}/responses/start` | Begin a partial response → id + secret token |
-| PUT | `/api/public/forms/{slug}/responses/{rid}/answers/{qid}` | Autosave one answer (token required) |
-| POST | `/api/public/forms/{slug}/responses` | Submit (validated server-side along the logic path) |
-| POST | `/api/public/forms/{slug}/uploads` · GET `/api/files/{key}` | File upload (10 MB) / download |
+| POST | `/api/public/forms/{slug}/responses/start` | Begin a partial response → id + token |
+| PUT | `/api/public/forms/{slug}/responses/{rid}/answers/{qid}` | Autosave one answer |
+| POST | `/api/public/forms/{slug}/responses` | Submit (validated along the logic path) |
+| POST · GET | `/api/public/forms/{slug}/uploads` · `/api/files/{key}` | Upload a file (10 MB) · download it |
 
-Status codes: 201 create, 204 no content, 400 business rule (e.g. publishing an empty form), 404 missing or unpublished, 409 conflict (stale reorder, response already submitted), 422 invalid answers `{"detail": {"errors": {"<question id>": "message"}}}`.
+Status codes:
 
-## Design decisions and assumptions
+- `201` created, `204` no content
+- `400` business rule (for example, publishing an empty form)
+- `404` missing or unpublished
+- `409` conflict
+- `422` invalid input, with errors keyed by question id
 
-| Decision | Alternative | Why |
-| --- | --- | --- |
-| Relational core + JSON `config` per question | Table per question type / MongoDB | Typed relationships where data is shared or queried (options, answers); flexible JSON where it's type-specific. The brief fixes SQLite |
-| One `answers` row per answer | One JSON blob per response | Real foreign keys, and per-question stats are a single `GROUP BY`. At Typeform's scale I'd consider a JSONB blob plus precomputed stats |
-| Soft-delete questions and options that have answers | Hard delete / full form versioning | Old responses stay readable after edits. Per-publish snapshots (versioning) would be the production approach; out of scope for this time box |
-| Options diffed by id on save | Replace all options | Renaming "Cold brew" doesn't detach its existing answers |
-| Granular autosave endpoints + stale-response guard | One `PUT` of the whole form | A whole-form overwrite recreates rows and orphans answers; the guard stops a slow old save overwriting a newer edit |
-| Shared question components for canvas and public form | Separate preview renderer | Live preview can never drift from the real form |
-| Logic evaluated in both browser and server | Browser only | The server decides which questions were seen, so a hidden required question can't block submission, and answers to skipped questions are dropped |
-| Random 8-character public slug | Numeric id | Forms can't be enumerated |
-| Partial responses tied to a secret token | Response id only | Ids are guessable; a token proves the browser started that response |
-| CSV cells starting with `= + - @` are escaped | Raw values | Prevents CSV formula injection |
+</details>
 
-**Assumptions.** A single default creator; authentication is out of scope, as the brief allows. Analytics count completed responses unless filtered. Editing a published form applies to future respondents, and the builder warns when a question already has answers. Times are stored in UTC.
+---
 
-**Measured rather than guessed.** The keyboard model, auto-advance timing (about 0.6 s), transition curves, progress bar, error-pill colours, admin design tokens and question-type colours were measured on live Typeform forms and the Typeform builder, then reproduced here.
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS 4, motion (animations), dnd-kit (drag and drop), sonner (toasts) |
+| **Backend** | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic 2 |
+| **Database** | SQLite |
+| **Tests** | pytest and FastAPI TestClient. 13 API tests cover validation, logic paths, option renames, partial responses, reorder, CSV injection and upload path tricks. |
+| **Hosting** | Vercel (web) and Render (API). `render.yaml` is a one-click blueprint. |
+
+## Known limits and next steps
+
+- **Free hosting resets the database** when the server restarts, and the demo data is reseeded. `render.yaml` describes the one-line switch to a persistent disk. For production I'd move to Postgres.
+- **No migrations yet.** Tables are created on startup. Alembic would be the next step.
+- **No frontend tests.** I checked the respondent flow and the builder with a scripted browser run (39 checks), but those checks aren't in the repo. I'd add Playwright tests for the respondent flow first.
+- **No rate limiting** on public submit and upload endpoints.
+- **Form versioning.** Edits to a live form apply immediately. Typeform-style per-publish snapshots would be the proper fix.

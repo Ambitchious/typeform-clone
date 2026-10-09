@@ -155,3 +155,13 @@ def test_upload_rejects_path_tricks(client):
     r = client.post("/api/public/forms/cafe-feedback/uploads", files={"file": ("../../etc/passwd", b"x")})
     assert r.status_code == 201 and "/" not in r.json()["name"]
     assert client.get("/api/files/not-a-hex-folder/passwd").status_code == 404
+
+
+def test_gallery_themes_are_read_only_and_settings_merge(client):
+    gallery = client.get("/api/themes").json()[0]
+    assert client.put(f"/api/themes/{gallery['id']}", json={**gallery, "name": "Mine"}).status_code == 403
+    form_id = cafe(client)["id"]
+    assert client.patch(f"/api/forms/{form_id}", json={"theme_id": 999999}).status_code == 422
+    before = client.get(f"/api/forms/{form_id}").json()["settings"]
+    after = client.patch(f"/api/forms/{form_id}", json={"settings": {"show_progress": False}}).json()["settings"]
+    assert after == {**before, "show_progress": False}

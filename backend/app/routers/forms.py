@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends, Response
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import schemas
 from ..db import get_db
-from ..models import Form, Theme
 from ..services import forms as svc
 
 router = APIRouter(prefix="/api", tags=["creator"])
@@ -12,7 +10,7 @@ router = APIRouter(prefix="/api", tags=["creator"])
 
 @router.get("/forms", response_model=list[schemas.FormSummary])
 def list_forms(db: Session = Depends(get_db)):
-    return svc.summarize(db, db.scalars(select(Form).order_by(Form.updated_at.desc())).all())
+    return svc.list_forms(db)
 
 
 @router.post("/forms", response_model=schemas.FormDetail, status_code=201)
@@ -27,22 +25,12 @@ def get_form(form_id: int, db: Session = Depends(get_db)):
 
 @router.patch("/forms/{form_id}", response_model=schemas.FormDetail)
 def update_form(form_id: int, data: schemas.FormUpdate, db: Session = Depends(get_db)):
-    form = svc.get_form(db, form_id)
-    fields = data.model_dump(exclude_unset=True)
-    if "theme_id" in fields and not db.get(Theme, fields["theme_id"]):
-        fields.pop("theme_id")
-    if "settings" in fields:
-        fields["settings"] = {**form.settings, **fields["settings"]}
-    for key, value in fields.items():
-        setattr(form, key, value)
-    db.commit()
-    return svc.detail(db, form)
+    return svc.detail(db, svc.update_form(db, svc.get_form(db, form_id), data))
 
 
 @router.delete("/forms/{form_id}", status_code=204)
 def delete_form(form_id: int, db: Session = Depends(get_db)):
-    db.delete(svc.get_form(db, form_id))
-    db.commit()
+    svc.delete_form(db, svc.get_form(db, form_id))
     return Response(status_code=204)
 
 
@@ -58,10 +46,7 @@ def publish(form_id: int, db: Session = Depends(get_db)):
 
 @router.post("/forms/{form_id}/unpublish", response_model=schemas.FormDetail)
 def unpublish(form_id: int, db: Session = Depends(get_db)):
-    form = svc.get_form(db, form_id)
-    form.status = "draft"
-    db.commit()
-    return svc.detail(db, form)
+    return svc.detail(db, svc.unpublish(db, svc.get_form(db, form_id)))
 
 
 @router.post("/forms/{form_id}/questions", response_model=schemas.QuestionOut, status_code=201)

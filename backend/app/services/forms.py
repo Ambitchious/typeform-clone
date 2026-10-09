@@ -52,6 +52,10 @@ def response_counts(db: Session, form_ids: list[int]) -> dict[int, tuple[int, in
     return {fid: (done, started) for fid, done, started in rows}
 
 
+def list_forms(db: Session) -> list[schemas.FormSummary]:
+    return summarize(db, list(db.scalars(select(Form).order_by(Form.updated_at.desc()))))
+
+
 def summarize(db: Session, forms: list[Form]) -> list[schemas.FormSummary]:
     counts = response_counts(db, [f.id for f in forms])
     return [
@@ -91,6 +95,23 @@ def create_form(db: Session, title: str) -> Form:
     return form
 
 
+def update_form(db: Session, form: Form, data: schemas.FormUpdate) -> Form:
+    fields = data.model_dump(exclude_unset=True)
+    if "theme_id" in fields and not db.get(Theme, fields["theme_id"]):
+        raise HTTPException(422, "Unknown theme")
+    if "settings" in fields:
+        fields["settings"] = {**form.settings, **fields["settings"]}
+    for key, value in fields.items():
+        setattr(form, key, value)
+    db.commit()
+    return form
+
+
+def delete_form(db: Session, form: Form) -> None:
+    db.delete(form)
+    db.commit()
+
+
 def duplicate_form(db: Session, source: Form) -> Form:
     copy = Form(title=f"{source.title} (copy)", theme_id=source.theme_id, settings=source.settings)
     id_map, option_map = {}, {}
@@ -126,6 +147,12 @@ def publish(db: Session, form: Form) -> Form:
     if not form.slug:
         form.slug = secrets.token_urlsafe(6)
     form.status = "published"
+    db.commit()
+    return form
+
+
+def unpublish(db: Session, form: Form) -> Form:
+    form.status = "draft"
     db.commit()
     return form
 

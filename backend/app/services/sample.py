@@ -9,9 +9,22 @@ from ..models import Form, Question, Response, now
 from .forms import live_questions
 from .responses import submit
 
-TEXT = ["Loved the vibe", "Quick service, friendly staff", "A bit noisy at lunch", "Great coffee, will be back",
-        "More vegan options please", "Perfect spot to work from"]
 NAMES = ["Aarav", "Diya", "Kabir", "Meera", "Rohan", "Ananya", "Ishaan", "Sara"]
+# Text answers are picked by a keyword in the question title, so test data reads like real answers.
+TEXT = {
+    "wrong": ["Waited 15 minutes for my order", "Coffee was lukewarm", "Too noisy to talk", "Table wasn't cleaned"],
+    "better": ["More vegan options please", "Faster wifi", "Open a little earlier", "More plug points"],
+    "dietary": ["Vegetarian", "No nuts, please", "Is there parking nearby?", "Vegan"],
+    "role": ["Frontend developer", "Student", "Product manager", "Data scientist"],
+    "": ["Loved it", "Great experience overall", "Nothing to add", "Keep it up"],
+}
+
+
+def sample_text(q: Question, rng: random.Random) -> str:
+    title = q.title.lower()
+    if "name" in title:
+        return rng.choice(NAMES)
+    return rng.choice(next(pool for key, pool in TEXT.items() if key in title))
 
 
 def random_answer(q: Question, rng: random.Random) -> Any:
@@ -19,10 +32,8 @@ def random_answer(q: Question, rng: random.Random) -> Any:
     if not q.required and rng.random() < 0.25:
         return None
     match q.type:
-        case "short_text":
-            return rng.choice(NAMES)
-        case "long_text":
-            return rng.choice(TEXT)
+        case "short_text" | "long_text":
+            return sample_text(q, rng)
         case "email":
             return f"{rng.choice(NAMES).lower()}{rng.randint(1, 99)}@example.com"
         case "number":
