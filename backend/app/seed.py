@@ -11,7 +11,7 @@ from .services.forms import DEFAULT_SETTINGS
 from .services.sample import generate_response
 
 THEMES = [
-    ("Pearl White", "Inter", "#262627", "#262627", "#262627", "#FFFFFF", "#FFFFFF"),
+    ("Pearl White", "Inter", "#262627", "#262627", "#262627", "#FFFFFF", "#FAFAFA"),
     ("Classic Blue", "Inter", "#191919", "#0445AF", "#0445AF", "#FFFFFF", "#FFFFFF"),
     ("Inky Black", "Inter", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#262627", "#262627"),
     ("Plain Blue", "Source Sans 3", "#3D3D3D", "#4FB0AE", "#4FB0AE", "#FFFFFF", "#FFFFFF"),

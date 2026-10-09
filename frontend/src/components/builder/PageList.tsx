@@ -45,7 +45,8 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
 
       <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-canvas p-3">
         <h2 className="px-2 pb-2 pt-1 text-[14px] font-medium text-ink">Pages</h2>
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        {/* Typeform groups the pages in a white card, with "Add content" as its last row. */}
+        <div className="min-h-0 overflow-y-auto rounded-xl border border-line bg-surface p-1.5">
           {form.settings.welcome.enabled && (
             <Row active={selected === "welcome"} onClick={() => setSelected("welcome")}
               tile={<span className="inline-flex h-6 items-center rounded-md bg-tile-screen px-1.5 text-[#3c323e]"><Icon name="welcome" size={15} /></span>}
@@ -62,10 +63,11 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
             </SortableContext>
           </DndContext>
           <button type="button" onClick={onAdd}
-            className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[14px] text-ink-2 hover:bg-hover">
+            className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border-t border-line py-2.5 text-[14px] text-ink-2 hover:bg-hover">
             <Icon name="plus" size={15} /> Add content
           </button>
         </div>
+        <div className="flex-1" />
         {!form.settings.welcome.enabled && (
           <button type="button" onClick={enableWelcome}
             className="mt-2 flex w-full shrink-0 items-center gap-2 rounded-xl border border-dashed border-line px-3 py-2.5 text-[14px] text-ink hover:bg-hover">
@@ -130,9 +132,9 @@ function Row({ active, onClick, tile, title, actions }: {
 }) {
   return (
     <div onClick={onClick} role="button" tabIndex={-1}
-      className={`group mb-1 flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-2 transition ${active ? "bg-surface shadow-sm ring-1 ring-line" : "hover:bg-hover"}`}>
+      className={`group mb-1 flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-2 transition ${active ? "bg-hover" : "hover:bg-hover"}`}>
       {tile}
-      <span className={`line-clamp-2 flex-1 pt-0.5 text-[13px] leading-snug ${title ? "text-ink" : "italic text-ink-3"}`}>{title || "..."}</span>
+      <span className="line-clamp-2 flex-1 pt-0.5 text-[13px] leading-snug text-ink">{title}</span>
       {actions}
     </div>
   );

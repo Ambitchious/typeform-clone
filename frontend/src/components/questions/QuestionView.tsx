@@ -90,7 +90,7 @@ export function InlineText({ value, onCommit, placeholder, suffix = "" }: { valu
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => draft !== value && onCommit(draft)}
         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.currentTarget.blur(); } }}
-        className="block w-full resize-none overflow-hidden bg-transparent outline-none placeholder:italic placeholder:opacity-45" />
+        className="block w-full resize-none overflow-hidden bg-transparent outline-none placeholder:italic placeholder:text-current placeholder:opacity-80" />
       {suffix && draft && <span aria-hidden className="pointer-events-none absolute top-0 left-0 whitespace-pre-wrap"><span className="invisible">{draft}</span>{suffix}</span>}
     </span>
   );
