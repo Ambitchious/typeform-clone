@@ -79,7 +79,7 @@ export function DropdownBody({ question, value, onChange, active, edit }: BodyPr
         </button>
       </div>
       {open && (
-        <ul id={`dd-${question.id}`} role="listbox" className="absolute z-10 mt-3 flex max-h-[min(320px,45vh)] w-full flex-col gap-2 overflow-y-auto pb-2">
+        <ul id={`dd-${question.id}`} role="listbox" className="mt-3 flex max-h-[min(320px,45vh)] w-full flex-col gap-2 overflow-y-auto pb-2">
           {filtered.length === 0 && <li className="px-2 py-3 text-[16px] opacity-70">No suggestions found</li>}
           {filtered.map((o, i) => (
             <li key={o.id} role="option" aria-selected={o.id === value}
