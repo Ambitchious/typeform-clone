@@ -2,7 +2,7 @@
 
 A full-stack clone of [Typeform](https://www.typeform.com): build forms in a three-panel builder, publish them to a public link, collect answers through the one-question-at-a-time conversational flow, and analyse results.
 
-**Live demo:** _frontend URL_ · **API docs:** _backend URL_/docs
+**Live demo:** https://typeform-clone-ochre-psi.vercel.app · **Try a form:** [Café Feedback](https://typeform-clone-ochre-psi.vercel.app/f/cafe-feedback) · [Tech Meetup RSVP](https://typeform-clone-ochre-psi.vercel.app/f/tech-meetup) · **API docs:** https://typeform-clone-api-okr0.onrender.com/docs
 
 > The API runs on Render's free plan: after 15 idle minutes it sleeps, so the first request can take up to a minute, and on wake-up the SQLite database is recreated with the seeded demo forms (forms created in between are not kept). `render.yaml` documents the one-step switch to a paid plan with a persistent disk.
 

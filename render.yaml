@@ -17,4 +17,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.7
       - key: CORS_ORIGINS
-        sync: false # the Vercel URL, e.g. https://typeform-clone.vercel.app
+        sync: false # the Vercel URL: https://typeform-clone-ochre-psi.vercel.app
