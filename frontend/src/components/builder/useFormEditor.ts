@@ -50,6 +50,19 @@ export function useFormEditor(initial: FormDetail) {
     setSelected(q.id);
   }, [form.id, form.questions, selected, track]);
 
+  /** Typeform's "Import questions": one short-text question per line, added in order after the selection. */
+  const importQuestions = useCallback(async (titles: string[]) => {
+    let after = typeof selected === "number" ? selected : form.questions.at(-1)?.id ?? null;
+    for (const title of titles) {
+      const q = await track(api.addQuestion(form.id, "short_text", after, title), "Couldn't import the questions");
+      if (!q) break;
+      after = q.id;
+    }
+    setForm(await api.form(form.id));
+    if (after) setSelected(after);
+    toast.success(`${titles.length} question${titles.length > 1 ? "s" : ""} imported`);
+  }, [form.id, form.questions, selected, track]);
+
   const deleteQuestion = useCallback(async (id: number) => {
     const index = form.questions.findIndex((q) => q.id === id);
     const done = await track(api.deleteQuestion(id).then(() => true), "Couldn't delete the question");
@@ -102,7 +115,7 @@ export function useFormEditor(initial: FormDetail) {
 
   return {
     form, setForm, selected, setSelected, saving: pending > 0,
-    patchQuestion, addQuestion, deleteQuestion, duplicateQuestion, reorder, updateForm, setTheme, setPublished,
+    patchQuestion, addQuestion, importQuestions, deleteQuestion, duplicateQuestion, reorder, updateForm, setTheme, setPublished,
   };
 }
 

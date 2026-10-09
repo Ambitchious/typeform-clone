@@ -46,7 +46,8 @@ export function Builder({ initial, tab, focusQuestion }: { initial: FormDetail; 
         {tab === "connect" && <ConnectPanel />}
       </div>
 
-      <AddContentModal open={modal === "add"} onClose={() => setModal(null)} onPick={add} />
+      <AddContentModal open={modal === "add"} onClose={() => setModal(null)} onPick={add}
+        onImport={(titles) => { setModal(null); editor.importQuestions(titles); }} />
       <DesignPanel open={modal === "design"} onClose={() => setModal(null)} editor={editor} anchor={designAnchor} />
       <FormSettingsModal open={modal === "settings"} onClose={() => setModal(null)} editor={editor} />
       <BulkChoicesModal question={editor.form.questions.find((q) => q.id === bulkFor)} onClose={() => setBulkFor(null)} editor={editor} />

@@ -53,8 +53,8 @@ export const api = {
   publish: (id: number) => request<FormDetail>(`/api/forms/${id}/publish`, { method: "POST" }),
   unpublish: (id: number) => request<FormDetail>(`/api/forms/${id}/unpublish`, { method: "POST" }),
 
-  addQuestion: (formId: number, type: QuestionType, afterQuestionId: number | null) =>
-    request<Question>(`/api/forms/${formId}/questions`, json("POST", { type, after_question_id: afterQuestionId })),
+  addQuestion: (formId: number, type: QuestionType, afterQuestionId: number | null, title = "") =>
+    request<Question>(`/api/forms/${formId}/questions`, json("POST", { type, title, after_question_id: afterQuestionId })),
   updateQuestion: (id: number, data: QuestionPatch) => request<Question>(`/api/questions/${id}`, json("PATCH", data)),
   deleteQuestion: (id: number) => request<void>(`/api/questions/${id}`, { method: "DELETE" }),
   reorder: (formId: number, questionIds: number[]) =>

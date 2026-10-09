@@ -88,6 +88,8 @@ const paths = {
   group: "M5 4v16M9 6h10M9 12h10M9 18h10",
   redirect: "M5 4v16M9 12h11M16 8l4 4-4 4",
   apps: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM17 14v6M14 17h6",
+  info: "M12 3a9 9 0 100 18 9 9 0 000-18zM12 11v6M12 7.5h.01",
+  tag: "M3 12V4h8l10 10-8 8zM7.5 7.5h.01",
   layers: "M4 5h16v5H4zM4 14h16v5H4z",
   bulb: "M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z",
 } as const;

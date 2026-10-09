@@ -3,93 +3,171 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { Question } from "@/lib/types";
-import { Icon } from "../icons";
+import { Icon, type IconName } from "../icons";
 import { CATALOGUE, type Element } from "../questions/registry";
 import { Button, IconButton, Modal, PremiumBadge, SoonBadge, Toggle } from "../ui";
 import type { Editor } from "./useFormEditor";
 
-const RECOMMENDED = ["Video and Audio", "Multiple Choice", "Short Text"];
+const RECOMMENDED = ["Video and Audio", "Short Text", "Multiple Choice"];
 const ALL = CATALOGUE.flat().flatMap((g) => g.items);
+const TABS = ["Add form elements", "Import questions", "Create with AI"] as const;
+const AI_TEMPLATES: [IconName, string, string, boolean][] = [
+  ["layers", "Lead qualification form", "Qualify your leads with AI-generated questions and scoring rules.", false],
+  ["tag", "Product recommendation quiz", "Boost sales by recommending products with AI-generated questions and matching rules.", true],
+  ["users", "Personality quiz", "Show different results based on answers with AI-generated questions and matching rules.", true],
+];
 
-export function AddContentModal({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (e: Element) => void }) {
+/** Typeform's "Add content" dialog, measured at 1440px: 960px wide, 14px text, 36px rows. */
+export function AddContentModal({ open, onClose, onPick, onImport }: {
+  open: boolean; onClose: () => void; onPick: (e: Element) => void; onImport: (titles: string[]) => void;
+}) {
+  const [tab, setTab] = useState<(typeof TABS)[number]>(TABS[0]);
   const [query, setQuery] = useState("");
-  useEffect(() => { if (open) setQuery(""); }, [open]);
+  const [imported, setImported] = useState("");
+  useEffect(() => { if (open) { setQuery(""); setImported(""); setTab(TABS[0]); } }, [open]);
   const match = (e: Element) => e.label.toLowerCase().includes(query.trim().toLowerCase());
   const pick = (e: Element) => (e.type || e.action ? onPick(e) : toast(`${e.label} is coming soon`));
   const soon = (what: string) => () => toast(`${what} is coming soon`);
+  const lines = imported.split("\n").map((l) => l.trim()).filter(Boolean);
 
   return (
-    <Modal open={open} onClose={onClose} width={1300} bare>
-      <div className="flex min-h-0 flex-col bg-canvas">
-      <div className="flex items-center gap-2 px-8 pt-2">
-        {["Add form elements", "Import questions", "Create with AI"].map((t, i) => (
-          <button key={t} type="button" onClick={i ? soon(t) : undefined} aria-current={!i}
-            className={`relative px-2.5 py-4 text-[15px] ${i ? "text-ink-2 hover:text-ink" : "text-ink"}`}>
-            {!i && <span className="absolute inset-x-0 top-0 h-[3px] rounded-b bg-ink" />}{t}
-          </button>
-        ))}
-        <IconButton icon="x" label="Close" onClick={onClose} className="ml-auto" />
-      </div>
-      <div className="m-3 mt-0 flex max-h-[78dvh] gap-12 overflow-y-auto rounded-xl bg-surface px-10 py-10 max-lg:flex-col">
-        <div className="w-[282px] shrink-0 max-lg:w-full">
-          <label className="flex h-11 items-center gap-2 rounded-lg border border-line px-3 text-ink-2 focus-within:border-ink">
-            <Icon name="search" size={18} />
-            <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search form elements"
-              className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none" />
-          </label>
-          {!query && (
-            <>
-              <h3 className="mb-3 mt-7 px-3 text-[15px] font-medium">Recommended</h3>
-              {RECOMMENDED.map((label) => ALL.find((e) => e.label === label)!).map((e) => (
-                <button key={e.label} type="button" onClick={() => pick(e)}
-                  className="mb-2 flex h-12 w-full items-center gap-3 rounded-lg border border-line px-3 text-[15px] hover:bg-hover">
-                  <Tile e={e} /><span className="flex-1 text-left">{e.label}</span>{e.premium && <PremiumBadge />}
-                </button>
-              ))}
-              <h3 className="mb-3 mt-7 px-3 text-[15px] font-medium">Connect to apps</h3>
-              {([["Hubspot", "#ff7a59", false], ["Salesforce", "#1798c1", true]] as const).map(([name, color, premium]) => (
-                <button key={name} type="button" onClick={soon(`${name} integration`)}
-                  className="mb-2 flex h-12 w-full items-center gap-3 rounded-lg border border-line px-3 text-[15px] hover:bg-hover">
-                  <span className="grid size-7 place-items-center rounded-md text-[13px] font-bold text-white" style={{ background: color }}>{name[0]}</span>
-                  <span className="flex-1 text-left">{name}</span>{premium && <PremiumBadge />}
-                </button>
-              ))}
-              <button type="button" onClick={soon("App integrations")}
-                className="flex h-11 w-full items-center gap-3 rounded-lg border border-line px-3 text-[15px] hover:bg-hover">
-                <Icon name="apps" size={18} /> Browse all apps
-              </button>
-            </>
-          )}
+    <Modal open={open} onClose={onClose} width={960} bare>
+      <div className="flex max-h-[calc(100dvh-56px)] flex-col bg-canvas">
+        <div className="flex h-14 shrink-0 items-center gap-1 pl-5 pr-3">
+          {TABS.map((t) => (
+            <button key={t} type="button" onClick={() => setTab(t)} aria-current={tab === t}
+              className={`relative h-8 rounded-lg px-3 text-[14px] font-medium hover:bg-hover ${tab === t ? "text-ink" : "text-ink-2"}`}>
+              {tab === t && <span className="absolute inset-x-0 -top-3 h-[3px] rounded-b bg-ink" />}{t}
+            </button>
+          ))}
+          <IconButton icon="x" label="Close" onClick={onClose} className="ml-auto" />
         </div>
-        {/* Row-major so each row of groups lines up across the three columns, as in Typeform. */}
-        <div className="grid flex-1 grid-cols-3 content-start gap-x-10 gap-y-10 max-md:grid-cols-2">
-          {[0, 1].flatMap((row) => CATALOGUE.map((column, c) => {
-            const group = column[row];
-            const items = group.items.filter(match);
-            return (
-              <section key={`${row}-${c}`} className={items.length ? "" : "hidden"}>
-                <h3 className="mb-2 h-6 text-[15px] font-medium">{group.title}</h3>
-                {items.map((e) => (
-                  <button key={e.label} type="button" onClick={() => pick(e)}
-                    className="group -mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-lg px-2 py-2 text-left text-[15px] text-ink hover:bg-hover">
-                    <Tile e={e} />
-                    <span className="flex-1">{e.label}</span>
-                    {!e.type && !e.action && <span className="hidden group-hover:inline"><SoonBadge /></span>}
-                    {e.premium && <PremiumBadge />}
+
+        <div className="ml-4 min-h-0 overflow-y-auto rounded-l-xl bg-surface p-8">
+          {tab === "Add form elements" && (
+            <div className="flex gap-8 max-md:flex-col">
+              <div className="w-[208px] shrink-0">
+                <label className="flex h-9 items-center gap-2 rounded-lg border border-line px-3 text-ink-2 focus-within:border-ink">
+                  <Icon name="search" size={16} />
+                  <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search form elements"
+                    className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none" />
+                </label>
+                {!query && (
+                  <>
+                    <h3 className="mb-2 mt-6 px-2 text-[14px] font-medium">Recommended</h3>
+                    {RECOMMENDED.map((label) => ALL.find((e) => e.label === label)!).map((e) => (
+                      <SideButton key={e.label} onClick={() => pick(e)} icon={<Tile e={e} />} label={e.label} premium={e.premium} />
+                    ))}
+                    <h3 className="mb-2 mt-6 px-2 text-[14px] font-medium">Connect to apps</h3>
+                    <SideButton onClick={soon("Hubspot integration")} label="Hubspot"
+                      icon={<span className="grid size-6 place-items-center rounded-md bg-[#ff7a59] text-[12px] font-bold text-white">H</span>} />
+                    <SideButton onClick={soon("Salesforce integration")} label="Salesforce" premium
+                      icon={<span className="grid size-6 place-items-center rounded-md bg-[#1798c1] text-[12px] font-bold text-white">S</span>} />
+                    <SideButton onClick={soon("App integrations")} label="Browse all apps" icon={<Icon name="apps" size={18} className="mx-[3px]" />} />
+                  </>
+                )}
+              </div>
+              {/* Row-major so each row of groups lines up across the three columns, as in Typeform. */}
+              <div className="grid flex-1 grid-cols-3 content-start gap-x-4 gap-y-6 max-md:grid-cols-2">
+                {[0, 1].flatMap((row) => CATALOGUE.map((column, c) => {
+                  const group = column[row];
+                  const items = group.items.filter(match);
+                  return (
+                    <section key={`${row}-${c}`} className={items.length ? "" : "hidden"}>
+                      <h3 className="flex h-10 items-start px-2 pt-2.5 text-[14px] font-medium">{group.title}</h3>
+                      {items.map((e) => (
+                        <button key={e.label} type="button" onClick={() => pick(e)}
+                          className="group flex h-9 w-full items-center gap-2.5 whitespace-nowrap rounded-lg pl-2 pr-1 text-left text-[14px] text-ink-2 hover:bg-hover hover:text-ink">
+                          <Tile e={e} />
+                          <span className="flex-1">{e.label}</span>
+                          {!e.type && !e.action && <span className="hidden group-hover:inline"><SoonBadge /></span>}
+                          {e.premium && <PremiumBadge />}
+                        </button>
+                      ))}
+                    </section>
+                  );
+                }))}
+              </div>
+            </div>
+          )}
+
+          {tab === "Import questions" && (
+            <div className="flex gap-8 max-md:flex-col">
+              <label className="flex flex-1 flex-col">
+                <span className="mb-2 text-[14px] text-ink-2">Form questions</span>
+                <textarea autoFocus value={imported} onChange={(e) => setImported(e.target.value)} rows={14}
+                  placeholder="Copy and paste or type in your questions, and press enter after each one."
+                  className="resize-none rounded-lg border border-line bg-canvas p-3 text-[14px] text-ink outline-none focus:border-ink" />
+              </label>
+              <div className="w-[240px] shrink-0 pt-7">
+                <div className="rounded-lg border border-[#8db4e8] bg-[#f5f9fe] p-4 text-[14px] text-ink dark:bg-transparent">
+                  <Icon name="info" size={20} className="mb-2 text-[#2f5e9e]" />
+                  <ul className="list-disc space-y-1 pl-5">
+                    <li>Paste or type your questions in the text field</li>
+                    <li>Or try Create with AI to build your form from a description, file upload, or URL</li>
+                  </ul>
+                </div>
+                <Button className="mt-6 w-full" onClick={() => setTab("Create with AI")}>Create with AI</Button>
+              </div>
+            </div>
+          )}
+
+          {tab === "Create with AI" && (
+            <div className="mx-auto max-w-[740px]">
+              <div className="flex gap-8 border-b border-line pb-6 max-md:flex-col">
+                <div className="w-[230px] shrink-0">
+                  <p className="text-[14px] text-ink-2">Typeform AI</p>
+                  <h3 className="mt-2 text-[22px] leading-snug text-ink">What would you like to create?</h3>
+                </div>
+                <form className="flex-1 rounded-xl p-1 shadow-[0_0_0_3px_#efe7fa]" onSubmit={(e) => { e.preventDefault(); toast("Typeform AI is coming soon"); }}>
+                  <div className="rounded-lg border border-[#c9b6e4] bg-surface p-3">
+                    <textarea autoFocus rows={4} placeholder="Create a…" aria-label="Describe your form"
+                      className="w-full resize-none bg-transparent text-[14px] text-ink outline-none" />
+                    <div className="flex items-center gap-3 text-ink-2">
+                      <Icon name="mic" size={17} /><Icon name="plus" size={17} /><Icon name="more" size={17} strokeWidth={3} />
+                      <button type="submit" aria-label="Send" className="ml-auto grid size-7 place-items-center rounded-md border border-line text-ink-3"><Icon name="send" size={13} /></button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div className="space-y-4 pt-6">
+                {AI_TEMPLATES.map(([icon, title, text, quiz]) => (
+                  <button key={title} type="button" onClick={soon(title)}
+                    className="flex w-full items-start gap-4 rounded-xl border border-line p-4 text-left hover:bg-hover">
+                    <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-[#edf3fb] text-[#2f5e9e]"><Icon name={icon} size={22} /></span>
+                    <span className="max-w-[360px] flex-1">
+                      <span className="block text-[15px] text-ink">{title}</span>
+                      <span className="mt-1 block text-[14px] text-ink-2">{text}</span>
+                    </span>
+                    {quiz && <span className="rounded-md border border-[#8db4e8] px-2 py-0.5 text-[13px] text-[#2f5e9e]">Match quiz</span>}
                   </button>
                 ))}
-              </section>
-            );
-          }))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+
+        {tab === "Import questions" && (
+          <div className="flex justify-end px-6 py-3">
+            <Button variant="primary" disabled={!lines.length} onClick={() => onImport(lines)}>Import questions</Button>
+          </div>
+        )}
       </div>
     </Modal>
   );
 }
 
+function SideButton({ onClick, icon, label, premium }: { onClick: () => void; icon: React.ReactNode; label: string; premium?: boolean }) {
+  return (
+    <button type="button" onClick={onClick}
+      className="mb-2 flex h-[38px] w-full items-center gap-2.5 rounded-lg border border-line pl-2 pr-3 text-[14px] text-ink hover:bg-hover">
+      {icon}<span className="flex-1 text-left">{label}</span>{premium && <PremiumBadge />}
+    </button>
+  );
+}
+
 function Tile({ e }: { e: Pick<Element, "icon" | "tile"> }) {
-  return <span className={`grid size-7 shrink-0 place-items-center rounded-md text-[#3c323e] ${e.tile}`}><Icon name={e.icon} size={17} /></span>;
+  return <span className={`grid size-6 shrink-0 place-items-center rounded-md text-[#3c323e] ${e.tile}`}><Icon name={e.icon} size={15} /></span>;
 }
 
 /** Typeform edits dropdown choices as one block of text, one choice per line. */
