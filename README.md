@@ -4,7 +4,7 @@ A full-stack clone of [Typeform](https://www.typeform.com): build forms in a thr
 
 **Live demo:** _frontend URL_ · **API docs:** _backend URL_/docs
 
-> The API runs on Render. If the first request takes a few seconds, the instance is waking up.
+> The API runs on Render's free plan: after 15 idle minutes it sleeps, so the first request can take up to a minute, and on wake-up the SQLite database is recreated with the seeded demo forms (forms created in between are not kept). `render.yaml` documents the one-step switch to a paid plan with a persistent disk.
 
 ## Features
 
@@ -30,7 +30,7 @@ A full-stack clone of [Typeform](https://www.typeform.com): build forms in a thr
 | Backend | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic 2 |
 | Database | SQLite (foreign keys enforced) |
 | Tests | pytest + FastAPI TestClient (12 API tests) |
-| Hosting | Vercel (frontend), Render with a persistent disk (API + SQLite + uploads) |
+| Hosting | Vercel (frontend), Render (API + SQLite + uploads; free plan, persistent disk optional) |
 
 ## Run locally
 
