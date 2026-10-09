@@ -60,6 +60,10 @@ function QuestionSettings({ q, editor }: { q: Question; editor: Editor }) {
       <Label>Answer</Label>
       <TypeSelect value={q.type} onChange={(type) => editor.patchQuestion(q.id, { type })} />
       <hr className="my-3 border-line" />
+      {["short_text", "email", "number"].includes(q.type) && (
+        <Toggle label="Map to contacts" hint="Save this answer to a contact profile" checked={false}
+          onChange={() => toast("Contacts are coming soon")} />
+      )}
       <Toggle label="Required" checked={q.required} onChange={(required) => editor.patchQuestion(q.id, { required })} />
 
       {q.type === "multiple_choice" && (
@@ -97,7 +101,11 @@ function QuestionSettings({ q, editor }: { q: Question; editor: Editor }) {
         </div>
       )}
       {(q.type === "short_text" || q.type === "long_text") && (
-        <NumberSetting label="Max characters" value={c.max_length} min={1} onChange={(max_length) => set({ max_length })} />
+        <>
+          <NumberSetting label="Max characters" value={c.max_length} min={1} onChange={(max_length) => set({ max_length })} />
+          <NumberSetting label="Answer validation" hint="Minimum characters" value={c.min_length} min={1}
+            onChange={(min_length) => set({ min_length })} />
+        </>
       )}
       {q.type === "number" && (
         <>
@@ -177,7 +185,9 @@ function Select({ label, value, onChange, options }: { label: string; value: str
 }
 
 /** A toggle that reveals a number field when switched on (Typeform's progressive disclosure). */
-function NumberSetting({ label, value, onChange, min }: { label: string; value?: number | null; onChange: (v: number | null) => void; min?: number }) {
+function NumberSetting({ label, value, onChange, min, hint }: {
+  label: string; value?: number | null; onChange: (v: number | null) => void; min?: number; hint?: string;
+}) {
   const [on, setOn] = useState(value != null);
   const [draft, setDraft] = useState(value != null ? String(value) : "");
   useEffect(() => setDraft(value != null ? String(value) : ""), [value]);
@@ -185,7 +195,7 @@ function NumberSetting({ label, value, onChange, min }: { label: string; value?:
     <>
       <Toggle label={label} checked={on} onChange={(v) => { setOn(v); if (!v) onChange(null); }} />
       {on && (
-        <input type="number" value={draft} min={min} placeholder="0-999999999" aria-label={label}
+        <input type="number" value={draft} min={min} placeholder={hint ?? "0-999999999"} aria-label={hint ?? label}
           onChange={(e) => setDraft(e.target.value)} onBlur={() => onChange(draft === "" ? null : Number(draft))}
           className="mb-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-[14px] text-ink outline-none focus:border-ink" />
       )}

@@ -7,7 +7,7 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/;
 
 export function validate(q: Question, value: AnswerValue | undefined): string | null {
   if (isEmpty(value)) return q.required ? "Please fill this in" : null;
-  const { min, max, max_length, max_selections } = q.config;
+  const { min, max, max_length, min_length, max_selections } = q.config;
   switch (q.type) {
     case "email":
       return EMAIL.test(String(value).trim()) ? null : "Hmm... that email doesn't look right";
@@ -20,7 +20,8 @@ export function validate(q: Question, value: AnswerValue | undefined): string | 
     }
     case "short_text":
     case "long_text":
-      return max_length && String(value).length > max_length ? `Please keep it under ${max_length} characters` : null;
+      if (max_length && String(value).length > max_length) return `Please keep it under ${max_length} characters`;
+      return min_length && String(value).trim().length < min_length ? `Please enter at least ${min_length} characters` : null;
     case "multiple_choice":
       return max_selections && Array.isArray(value) && value.length > max_selections
         ? `Please select up to ${max_selections} options` : null;

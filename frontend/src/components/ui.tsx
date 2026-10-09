@@ -50,7 +50,7 @@ export function TypeTile({ type, label, size = "md" }: { type: QuestionType; lab
 export function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-3 py-2 text-[14px] text-ink-2">
-      <span title={hint}>{label}</span>
+      <span className="flex items-center gap-1.5">{label}{hint && <span title={hint}><Icon name="help" size={14} className="text-ink-3" /></span>}</span>
       <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)}
         className={`relative h-5 w-9 shrink-0 rounded-full transition ${checked ? "bg-ink" : "bg-ink/20"}`}>
         <span className={`absolute top-0.5 size-4 rounded-full bg-surface shadow transition-all ${checked ? "left-[18px]" : "left-0.5"}`} />

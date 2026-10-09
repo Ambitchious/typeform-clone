@@ -176,3 +176,13 @@ def test_custom_theme_lifecycle(client):
     assert client.delete(f"/api/themes/{theme['id']}").status_code == 409
     client.patch(f"/api/forms/{form_id}", json={"theme_id": client.get("/api/themes").json()[0]["id"]})
     assert client.delete(f"/api/themes/{theme['id']}").status_code == 204
+
+
+def test_answer_validation_minimum_characters(client):
+    form = client.post("/api/forms", json={"title": "Validation"}).json()
+    q = client.post(f"/api/forms/{form['id']}/questions", json={"type": "short_text", "title": "Why?"}).json()
+    client.patch(f"/api/questions/{q['id']}", json={"config": {"min_length": 5}})
+    slug = client.post(f"/api/forms/{form['id']}/publish").json()["slug"]
+    short = client.post(f"/api/public/forms/{slug}/responses", json={"answers": {str(q["id"]): "abc"}})
+    assert short.status_code == 422 and "at least 5" in short.json()["detail"]["errors"][str(q["id"])]
+    assert client.post(f"/api/public/forms/{slug}/responses", json={"answers": {str(q["id"]): "because"}}).status_code == 201

@@ -24,9 +24,11 @@ def is_empty(value: Any) -> bool:
 def _text(q: Question, v: Any) -> list[Row]:
     if not isinstance(v, str):
         raise AnswerError("Please enter some text")
-    limit = q.config.get("max_length")
+    limit, least = q.config.get("max_length"), q.config.get("min_length")
     if limit and len(v) > limit:
         raise AnswerError(f"Please keep it under {limit} characters")
+    if least and len(v.strip()) < least:
+        raise AnswerError(f"Please enter at least {least} characters")
     return [(None, v.strip())]
 
 

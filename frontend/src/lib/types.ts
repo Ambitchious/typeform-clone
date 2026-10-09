@@ -40,6 +40,7 @@ export interface QuestionConfig {
   min?: number | null;
   max?: number | null;
   max_length?: number | null;
+  min_length?: number | null;
   placeholder?: string;
   randomize?: boolean;
   alphabetical?: boolean;

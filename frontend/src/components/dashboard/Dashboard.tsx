@@ -101,7 +101,7 @@ export function Dashboard({ initial }: { initial: FormSummary[] }) {
         </div>
       </header>
 
-      <div className="mx-4 mb-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-canvas">
+      <div className="mx-4 mb-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-sm bg-canvas">
         <nav className="flex h-14 shrink-0 items-stretch gap-1 overflow-x-auto border-b border-line px-3" aria-label="Sections">
           {([["forms", "Forms"], ["users", "Contacts"], ["zap", "Automations"], ["chart", "Insights"], ["file", "Pages"]] as const).map(([icon, label], i) => (
             <button key={label} type="button" onClick={i ? soon(label) : undefined} aria-current={!i ? "page" : undefined}
