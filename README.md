@@ -286,7 +286,7 @@ Status codes:
 | **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS 4, motion (animations), dnd-kit (drag and drop), sonner (toasts) |
 | **Backend** | Python 3.12, FastAPI, SQLAlchemy 2, Pydantic 2 |
 | **Database** | SQLite |
-| **Tests** | pytest and FastAPI TestClient. 15 API tests cover validation, logic paths, option renames, partial responses, reorder, CSV injection and upload path tricks. |
+| **Tests** | pytest and FastAPI TestClient. 16 API tests cover validation, logic paths, option renames, partial responses, reorder, CSV injection and upload path tricks. |
 | **Hosting** | Vercel (web) and Render (API). `render.yaml` is a one-click blueprint. |
 
 ## Known limits and next steps
