@@ -45,27 +45,29 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
 
       <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-canvas p-3">
         <h2 className="px-2 pb-2 pt-1 text-[14px] font-medium text-ink">Pages</h2>
-        {/* Typeform groups the pages in a white card, with "Add content" as its last row. */}
-        <div className="min-h-0 overflow-y-auto rounded-xl border border-line bg-surface p-1.5">
+        {/* Like Typeform, each page is its own card; the selected one carries "Add content" beneath it. */}
+        <div className="min-h-0 overflow-y-auto">
           {form.settings.welcome.enabled && (
-            <Row active={selected === "welcome"} onClick={() => setSelected("welcome")}
+            <div className="mb-2 rounded-xl border border-line bg-surface p-1.5"><Row active={selected === "welcome"} onClick={() => setSelected("welcome")}
               tile={<span className="inline-flex h-6 items-center rounded-md bg-tile-screen px-1.5 text-[#3c323e]"><Icon name="welcome" size={15} /></span>}
-              title={form.settings.welcome.title || "Welcome screen"} />
+              title={form.settings.welcome.title || "Welcome screen"} /></div>
           )}
           <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={form.questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
               <ol>
                 {form.questions.map((q, i) => (
                   <SortableRow key={q.id} q={q} index={i} active={selected === q.id} onSelect={() => setSelected(q.id)}
-                    onDuplicate={() => duplicateQuestion(q)} onDelete={() => onDelete(q)} />
+                    onDuplicate={() => duplicateQuestion(q)} onDelete={() => onDelete(q)} onAdd={onAdd} />
                 ))}
               </ol>
             </SortableContext>
           </DndContext>
-          <button type="button" onClick={onAdd}
-            className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border-t border-line py-2.5 text-[14px] text-ink-2 hover:bg-hover">
-            <Icon name="plus" size={15} /> Add content
-          </button>
+          {typeof selected !== "number" && (
+            <button type="button" onClick={onAdd}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-line bg-surface py-2.5 text-[14px] text-ink-2 hover:bg-hover">
+              <Icon name="plus" size={15} /> Add content
+            </button>
+          )}
         </div>
         <div className="flex-1" />
         {!form.settings.welcome.enabled && (
@@ -102,13 +104,13 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
   );
 }
 
-function SortableRow({ q, index, active, onSelect, onDuplicate, onDelete }: {
-  q: Question; index: number; active: boolean; onSelect: () => void; onDuplicate: () => void; onDelete: () => void;
+function SortableRow({ q, index, active, onSelect, onDuplicate, onDelete, onAdd }: {
+  q: Question; index: number; active: boolean; onSelect: () => void; onDuplicate: () => void; onDelete: () => void; onAdd: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: q.id });
   return (
     <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`relative ${isDragging ? "z-10 opacity-90 shadow-lg" : ""}`} {...attributes} {...listeners}
+      className={`relative mb-2 rounded-xl border border-line bg-surface p-1.5 ${isDragging ? "z-10 opacity-90 shadow-lg" : ""}`} {...attributes} {...listeners}
       aria-label={`Question ${index + 1}: ${q.title || "Untitled"}. Press space to drag.`}>
       <Row active={active} onClick={onSelect} tile={<TypeTile type={q.type} label={index + 1} />} title={q.title}
         actions={
@@ -123,6 +125,12 @@ function SortableRow({ q, index, active, onSelect, onDuplicate, onDelete }: {
             </button>
           )} />
         } />
+      {active && (
+        <button type="button" onClick={onAdd} onPointerDown={(e) => e.stopPropagation()}
+          className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border-t border-line py-2 text-[14px] text-ink-2 hover:bg-hover">
+          <Icon name="plus" size={15} /> Add content
+        </button>
+      )}
     </li>
   );
 }
@@ -132,7 +140,7 @@ function Row({ active, onClick, tile, title, actions }: {
 }) {
   return (
     <div onClick={onClick} role="button" tabIndex={-1}
-      className={`group mb-1 flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-2 transition ${active ? "bg-hover" : "hover:bg-hover"}`}>
+      className={`group flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-2 transition ${active ? "bg-hover" : "hover:bg-hover"}`}>
       {tile}
       <span className="line-clamp-2 flex-1 pt-0.5 text-[13px] leading-snug text-ink">{title}</span>
       {actions}

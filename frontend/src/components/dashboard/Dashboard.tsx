@@ -203,7 +203,7 @@ export function Dashboard({ initial }: { initial: FormSummary[] }) {
               </thead>
               <tbody>
                 {shown.map((f) => (
-                  <tr key={f.id} className="group bg-surface shadow-[0_0_0_1px_var(--line)] transition hover:shadow-[0_0_0_1px_var(--ink-3)]">
+                  <tr key={f.id} className="group [&>td]:border-y [&>td]:border-line [&>td]:bg-surface [&>td]:transition hover:[&>td]:border-ink-3 [&>td:first-child]:border-l [&>td:last-child]:border-r">
                     <td className="rounded-l-xl p-0">
                       <Link href={`/forms/${f.id}/edit`} className="flex items-center gap-3 px-3 py-2.5">
                         <FormThumb f={f} />

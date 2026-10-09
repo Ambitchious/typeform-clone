@@ -54,7 +54,7 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, settingsOpen, onTo
 
       {/* Like Typeform, the canvas is a 16:9 preview card centred in the space, drawn at reduced scale. */}
       <div className="grid min-h-0 flex-1 place-items-center overflow-hidden">
-        <div className={`${themeClass(form.theme)} relative flex overflow-y-auto rounded-lg ring-1 ring-line ${mobile ? "h-full w-[375px] max-w-full" : "aspect-video w-[min(100%-24px,calc((100dvh-160px)*16/9))]"}`}
+        <div className={`${themeClass(form.theme)} relative flex overflow-y-auto ring-1 ring-line ${mobile ? "h-full w-[375px] max-w-full" : "aspect-video w-[min(100%-24px,calc((100dvh-160px)*16/9))]"}`}
           style={themeVars(form.theme)}>
           <div className={`m-auto w-full max-w-[800px] py-10 [zoom:0.82] ${mobile ? "px-6" : "px-[9%]"}`}>
             {question && (
