@@ -5,6 +5,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useId } from "react";
 import type { Question } from "@/lib/types";
 import { Icon } from "../icons";
 import { Menu, TypeTile } from "../ui";
@@ -18,6 +19,8 @@ interface Props {
 
 export function PageList({ editor, onAdd, onDelete }: Props) {
   const { form, selected, setSelected, reorder, updateForm, duplicateQuestion } = editor;
+  // dnd-kit generates accessibility ids; a stable one keeps server and client HTML identical.
+  const dndId = useId();
   // A small drag distance keeps plain clicks (select a question) from starting a drag.
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -45,7 +48,7 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
               Add Welcome Screen <Icon name="plus" size={15} />
             </button>
           )}
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={form.questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
               <ol>
                 {form.questions.map((q, i) => (

@@ -60,7 +60,8 @@ const slide: Variants = {
 const part: Variants = { enter: { opacity: 0, y: 12 }, center: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 140, damping: 22 } } };
 
 const AUTO_ADVANCE_MS = 600;
-const TRANSITION_LOCK_MS = 450;
+// Upper bound on a transition, in case the exit animation never reports back (e.g. a hidden tab).
+const TRANSITION_LOCK_MS = 1500;
 
 interface Props {
   form: PublicForm;
@@ -133,7 +134,12 @@ export function FormRunner({ form, preview = false }: Props) {
       return dispatch({ type: "done" });
     }
     try {
-      await api.submit(slug, s.answers, session.current);
+      await api.submit(slug, s.answers, session.current).catch((e) => {
+        // The saved partial response is gone (e.g. the server's database was reset): submit as new.
+        if (!(e instanceof ApiError && e.status === 404 && session.current)) throw e;
+        session.current = null;
+        return api.submit(slug, s.answers, null);
+      });
       localStorage.removeItem(storageKey);
       dispatch({ type: "done" });
     } catch (e) {
@@ -154,6 +160,13 @@ export function FormRunner({ form, preview = false }: Props) {
     }
   }, [preview, slug, storageKey, questions]);
 
+  // Navigation stays locked until the outgoing question has fully left (onExitComplete), and focus
+  // leaves its field now — otherwise fast typing lands in the question that is animating away.
+  const beginTransition = () => {
+    lockUntil.current = Date.now() + TRANSITION_LOCK_MS;
+    (document.activeElement as HTMLElement | null)?.blur();
+  };
+
   const goNext = useCallback(() => {
     const s = stateRef.current;
     if (s.screen !== "question" || Date.now() < lockUntil.current) return;
@@ -166,14 +179,14 @@ export function FormRunner({ form, preview = false }: Props) {
     savePartial(q.id, value);
     const next = nextIndex(questions, i, value);
     if (next === null) return submit();
-    lockUntil.current = Date.now() + TRANSITION_LOCK_MS;
+    beginTransition();
     dispatch({ type: "go", index: next });
   }, [questions, savePartial, submit]);
 
   const goBack = useCallback(() => {
-    if (Date.now() < lockUntil.current) return;
+    if (Date.now() < lockUntil.current || stateRef.current.path.length < 2) return;
     clearTimeout(autoTimer.current);
-    lockUntil.current = Date.now() + TRANSITION_LOCK_MS;
+    beginTransition();
     dispatch({ type: "back" });
   }, []);
 
@@ -186,7 +199,7 @@ export function FormRunner({ form, preview = false }: Props) {
   }, [questions, goNext]);
 
   const start = useCallback(() => {
-    lockUntil.current = Date.now() + TRANSITION_LOCK_MS;
+    beginTransition();
     dispatch({ type: "start" });
   }, []);
 
@@ -229,7 +242,7 @@ export function FormRunner({ form, preview = false }: Props) {
         </div>
       )}
 
-      <AnimatePresence mode="wait" custom={state.dir} initial={false}>
+      <AnimatePresence mode="wait" custom={state.dir} initial={false} onExitComplete={() => { lockUntil.current = 0; }}>
         {state.screen === "welcome" && (
           <motion.section key="welcome" custom={1} variants={slide} initial="enter" animate="center" exit="exit"
             className="flex flex-1 flex-col items-center justify-center px-6 pb-24 text-center sm:pb-0">

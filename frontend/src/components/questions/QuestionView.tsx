@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsPresent } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { AnswerValue, Question } from "@/lib/types";
 import { ChoiceBody } from "./ChoiceBody";
@@ -36,6 +37,8 @@ interface Props {
  *  which is why the builder's preview can never drift from what respondents see. */
 export function QuestionView({ question, number, value, onChange = () => {}, onSubmit = () => {}, active = false, letters = true, slug, edit }: Props) {
   const Body = BODIES[question.type];
+  // A question animating out keeps its last props; it must stop reacting to the keyboard at once.
+  const isPresent = useIsPresent();
   return (
     <div className="w-full">
       <div className="relative">
@@ -64,7 +67,7 @@ export function QuestionView({ question, number, value, onChange = () => {}, onS
         )}
       </div>
       <div className="mt-7 sm:mt-8">
-        <Body question={question} value={value} onChange={onChange} onSubmit={onSubmit} active={active}
+        <Body question={question} value={value} onChange={onChange} onSubmit={onSubmit} active={active && isPresent}
           letters={letters} edit={edit} slug={slug} />
       </div>
     </div>

@@ -4,7 +4,7 @@ A full-stack clone of [Typeform](https://www.typeform.com): build forms in a thr
 
 **Live demo:** https://typeform-clone-ochre-psi.vercel.app · **Try a form:** [Café Feedback](https://typeform-clone-ochre-psi.vercel.app/f/cafe-feedback) · [Tech Meetup RSVP](https://typeform-clone-ochre-psi.vercel.app/f/tech-meetup) · **API docs:** https://typeform-clone-api-okr0.onrender.com/docs
 
-> The API runs on Render's free plan: after 15 idle minutes it sleeps, so the first request can take up to a minute, and on wake-up the SQLite database is recreated with the seeded demo forms (forms created in between are not kept). `render.yaml` documents the one-step switch to a paid plan with a persistent disk.
+> The API runs on Render's free plan, which sleeps after 15 idle minutes and resets its disk on wake-up. A GitHub Action (`.github/workflows/keep-warm.yml`) pings it every 10 minutes to keep it awake and the data intact; if it does sleep, the first request takes up to a minute and the seeded demo forms are recreated. `render.yaml` documents the one-step switch to a paid plan with a persistent disk.
 
 ## Features
 

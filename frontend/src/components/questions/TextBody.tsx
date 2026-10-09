@@ -47,7 +47,7 @@ export function TextBody({ question, value, onChange, onSubmit, active, edit }: 
   };
 
   const common = {
-    ref, value: text, placeholder, disabled: !!edit, onKeyDown,
+    ref, value: text, placeholder, disabled: !!edit || !active, onKeyDown,
     className: "tf-input disabled:cursor-default",
     "aria-label": question.title || "Your answer",
   };
