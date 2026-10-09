@@ -13,9 +13,9 @@ export function SettingsPanel({ editor }: { editor: Editor }) {
   const { form, selected } = editor;
   const question = form.questions.find((q) => q.id === selected);
   return (
-    <aside className="flex w-[264px] shrink-0 flex-col gap-3 overflow-y-auto" aria-label="Settings">
+    <aside className="flex w-[256px] shrink-0 flex-col gap-4 overflow-y-auto" aria-label="Settings">
       {question && (
-        <div className="rounded-xl bg-panel p-4">
+        <div className="rounded-xl bg-canvas p-4">
           <Label>Question <Icon name="help" size={14} className="text-ink-3" /></Label>
           <div className="grid grid-cols-2 rounded-lg bg-hover p-0.5 text-[14px]" role="radiogroup" aria-label="Question format">
             <button type="button" role="radio" aria-checked className="flex h-8 items-center justify-center gap-2 rounded-md bg-surface text-ink shadow-sm">
@@ -28,22 +28,22 @@ export function SettingsPanel({ editor }: { editor: Editor }) {
           </div>
         </div>
       )}
-      <div className="flex-1 rounded-xl bg-panel p-4">
+      <div className="flex-1 rounded-xl bg-canvas p-4">
         {question && <QuestionSettings key={question.id} q={question} editor={editor} />}
         {selected === "welcome" && <WelcomeSettings editor={editor} />}
         {selected === "end" && <EndSettings editor={editor} />}
       </div>
       {question && (
         <>
-          <div className="flex items-center justify-between rounded-xl bg-panel px-4 py-3">
-            <span className="text-[15px] font-medium">Logic</span>
+          <div className="flex items-center justify-between rounded-xl bg-canvas px-4 py-3">
+            <span className="text-[14px] font-medium">Logic</span>
             <Link href={`/forms/${form.id}/edit?tab=workflow&q=${question.id}`} aria-label="Edit logic"
               className="flex h-8 min-w-8 items-center justify-center gap-1 rounded-lg border border-line bg-surface px-2 text-[13px] text-ink-2 hover:text-ink">
               {question.logic_rules.length > 0 && `${question.logic_rules.length} rule${question.logic_rules.length > 1 ? "s" : ""}`}
               <Icon name={question.logic_rules.length ? "right" : "plus"} size={16} />
             </Link>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-panel px-4 py-3 text-[15px] font-medium">
+          <div className="flex items-center gap-2 rounded-xl bg-canvas px-4 py-3 text-[14px] font-medium">
             Comments <PremiumBadge />
           </div>
         </>
@@ -161,7 +161,7 @@ function TypeSelect({ value, onChange }: { value: QuestionType; onChange: (t: Qu
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <h3 className="mb-2 flex items-center gap-1.5 text-[15px] font-medium text-ink">{children}</h3>;
+  return <h3 className="mb-2 flex items-center gap-1.5 text-[14px] font-medium text-ink">{children}</h3>;
 }
 
 function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {

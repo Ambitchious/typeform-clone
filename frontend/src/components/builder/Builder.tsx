@@ -29,10 +29,10 @@ export function Builder({ initial, tab, focusQuestion }: { initial: FormDetail; 
   };
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh flex-col bg-surface">
       <TopBar form={editor.form} tab={tab} saving={editor.saving}
         onRename={(title) => editor.updateForm({ title })} onPublish={editor.setPublished} />
-      <div className="flex min-h-0 flex-1 gap-3 px-4 pb-4">
+      <div className="flex min-h-0 flex-1 gap-4 px-4 pb-4">
         {tab === "content" && (
           <>
             <PageList editor={editor} onAdd={() => setModal("add")} onDelete={setToDelete} />

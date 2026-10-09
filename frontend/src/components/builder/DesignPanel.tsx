@@ -115,7 +115,7 @@ export function DesignPanel({ open, onClose, editor, anchor }: Props) {
           <button type="button" onPointerDown={drag} aria-label="Drag to move" className="cursor-grab touch-none text-ink-2 active:cursor-grabbing">
             <Icon name="drag" size={18} strokeWidth={3} />
           </button>
-          <h2 className="flex min-w-0 flex-1 items-center gap-1 text-[15px] text-ink">
+          <h2 className="flex min-w-0 flex-1 items-center gap-1 text-[14px] font-medium text-ink">
             {editing ? (
               <>
                 <button type="button" className="hover:underline" onClick={() => leave(() => {})}>Design</button>
@@ -128,7 +128,7 @@ export function DesignPanel({ open, onClose, editor, anchor }: Props) {
           <IconButton icon="x" label="Close" onClick={() => leave(onClose)} />
         </header>
 
-        <div className="flex min-h-0 flex-col rounded-xl bg-panel">
+        <div className="flex min-h-0 flex-col rounded-xl bg-canvas">
           <Tabs items={editing ? EDIT_TABS : [["mine", "My themes"], ["gallery", "Gallery"]]} value={editing ? editing.tab : tab}
             onChange={(t) => (editing ? setEditing({ ...editing, tab: t as EditTab }) : setTab(t as "mine" | "gallery"))}
             badge={editing ? "logo" : undefined} />

@@ -37,14 +37,14 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
   const enableWelcome = () => { updateForm({ settings: { welcome: { ...form.settings.welcome, enabled: true } } }); setSelected("welcome"); };
 
   return (
-    <aside className="flex w-[264px] shrink-0 flex-col gap-3 overflow-hidden" aria-label="Form pages">
+    <aside className="flex w-[256px] shrink-0 flex-col gap-4 overflow-hidden" aria-label="Form pages">
       <button type="button" onClick={() => toast("Other form modes are coming soon")}
-        className="flex h-12 shrink-0 items-center gap-2 rounded-xl bg-panel px-4 text-[14px] text-ink-2 hover:text-ink">
+        className="flex h-12 shrink-0 items-center gap-2 rounded-xl bg-canvas px-4 text-[14px] text-ink-2 hover:text-ink">
         <Icon name="layers" size={16} /> Universal mode <Icon name="down" size={16} className="ml-auto" />
       </button>
 
-      <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-panel p-3">
-        <h2 className="px-2 pb-2 pt-1 text-[15px] font-medium text-ink">Pages</h2>
+      <section className="flex min-h-0 flex-1 flex-col rounded-xl bg-canvas p-3">
+        <h2 className="px-2 pb-2 pt-1 text-[14px] font-medium text-ink">Pages</h2>
         <div className="min-h-0 flex-1 overflow-y-auto">
           {form.settings.welcome.enabled && (
             <Row active={selected === "welcome"} onClick={() => setSelected("welcome")}
@@ -75,9 +75,9 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
         )}
       </section>
 
-      <section className="shrink-0 rounded-xl bg-panel p-3">
+      <section className="shrink-0 rounded-xl bg-canvas p-3">
         <div className="flex items-center justify-between px-2 pb-2 pt-1">
-          <h2 className="text-[15px] font-medium text-ink">Endings</h2>
+          <h2 className="text-[14px] font-medium text-ink">Endings</h2>
           <button type="button" aria-label="Add ending" onClick={() => toast("Multiple endings are coming soon")}
             className="grid size-8 place-items-center rounded-lg border border-line bg-surface text-ink-2 hover:text-ink">
             <Icon name="plus" size={16} />
@@ -88,7 +88,7 @@ export function PageList({ editor, onAdd, onDelete }: Props) {
           title={form.settings.thank_you.title || "Thank you screen"} />
       </section>
 
-      <form className="shrink-0 rounded-xl bg-panel p-2" onSubmit={(e) => { e.preventDefault(); toast("Typeform AI is coming soon"); }}>
+      <form className="shrink-0 rounded-xl bg-canvas p-2" onSubmit={(e) => { e.preventDefault(); toast("Typeform AI is coming soon"); }}>
         <div className="flex h-12 items-center gap-2 rounded-lg border border-[#c9b6e4] bg-surface px-3 shadow-[0_0_0_3px_#efe7fa]">
           <Icon name="mic" size={17} className="text-ink-2" />
           <span className="h-5 w-px bg-line" />

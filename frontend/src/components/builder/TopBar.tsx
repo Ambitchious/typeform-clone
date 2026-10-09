@@ -62,7 +62,7 @@ export function TopBar({ form, tab, saving, onRename, onPublish }: Props) {
         {/* Like Typeform, Results appears once a form is live. */}
         {TABS.filter((t) => t.id !== "results" || form.status === "published" || tab === "results").map((t) => (
           <Link key={t.id} href={t.href(form.id)} role="tab" aria-selected={tab === t.id}
-            className={`relative flex items-center px-3 text-[15px] transition ${tab === t.id ? "text-ink" : "text-ink-2 hover:text-ink"}`}>
+            className={`relative flex items-center px-3 text-[14px] font-medium transition ${tab === t.id ? "text-ink" : "text-ink-2 hover:text-ink"}`}>
             {t.label}
             {tab === t.id && <span className="absolute inset-x-3 top-0 h-[3px] rounded-b bg-ink" />}
           </Link>

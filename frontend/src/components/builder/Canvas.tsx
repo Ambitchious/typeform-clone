@@ -35,8 +35,8 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, settingsOpen, onTo
   const runnerForm: PublicForm = { title: form.title, slug: form.slug ?? "preview", theme: form.theme, settings: form.settings, questions: form.questions };
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col gap-3">
-      <div className="flex items-center gap-1 rounded-xl bg-panel p-2">
+    <main className="flex min-w-0 flex-1 flex-col gap-4">
+      <div className="flex h-12 shrink-0 items-center gap-1 rounded-xl bg-canvas p-2">
         <Button variant="primary" icon="plus" onClick={onAdd}>Add content</Button>
         <span className="mx-1 h-5 w-px bg-line" />
         <Button variant="ghost" icon="palette" onClick={(e) => onDesign(e.currentTarget)}>Design</Button>
@@ -52,10 +52,11 @@ export function Canvas({ editor, onAdd, onDesign, onSettings, settingsOpen, onTo
           className="ml-auto" aria-pressed={settingsOpen} />
       </div>
 
-      <div className="grid min-h-0 flex-1 place-items-center overflow-hidden rounded-xl bg-panel p-4">
-        <div className={`${themeClass(form.theme)} relative flex h-full w-full overflow-y-auto rounded-lg shadow-sm ring-1 ring-line transition-[max-width] duration-300 ${mobile ? "max-w-[375px]" : "max-w-full"}`}
+      {/* Like Typeform, the canvas is a 16:9 preview card centred in the space, drawn at reduced scale. */}
+      <div className="grid min-h-0 flex-1 place-items-center overflow-hidden">
+        <div className={`${themeClass(form.theme)} relative flex overflow-y-auto rounded-lg ring-1 ring-line ${mobile ? "h-full w-[375px] max-w-full" : "aspect-video w-[min(100%-24px,calc((100dvh-160px)*16/9))]"}`}
           style={themeVars(form.theme)}>
-          <div className={`m-auto w-full max-w-[720px] py-16 ${mobile ? "px-6" : "px-14"}`}>
+          <div className={`m-auto w-full max-w-[720px] py-10 [zoom:0.82] ${mobile ? "px-6" : "px-[12%]"}`}>
             {question && (
               <QuestionView key={question.id} question={question} number={form.settings.show_numbers ? index + 1 : null}
                 letters={form.settings.letters_on_answers}
