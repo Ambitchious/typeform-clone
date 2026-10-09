@@ -29,7 +29,7 @@
 
 ## What's in it
 
-| | |
+| Area | What you get |
 | --- | --- |
 | **Builder** | Three panels like Typeform's: pages, a live canvas and settings. You edit titles and choices directly on the canvas. Drag to reorder (mouse or keyboard). Duplicate, delete with a warning when a question already has answers, change a question's type in place, and edit the welcome and thank-you screens. Changes autosave with a *Saving… / Saved* indicator. |
 | **9 question types** | Short text, long text, multiple choice (single or multi, with selection limit and randomise), searchable dropdown, email, number (min/max), yes/no, rating (stars, hearts, thumbs or circles; 3–10 steps) and file upload. |
