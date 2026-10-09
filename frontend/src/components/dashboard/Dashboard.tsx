@@ -36,7 +36,7 @@ export function Dashboard({ initial }: { initial: FormSummary[] }) {
     setCreating(true);
     try {
       const form = await api.createForm();
-      router.push(`/forms/${form.id}/edit`);
+      router.push(`/forms/${form.id}/edit?start=1`);
     } catch {
       toast.error("Couldn't create a form");
       setCreating(false);

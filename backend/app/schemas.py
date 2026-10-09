@@ -90,7 +90,7 @@ class ReorderIn(BaseModel):
 
 
 class FormCreate(BaseModel):
-    title: str = Field(default="My new form", max_length=200)
+    title: str = Field(default="New form", max_length=200)
 
 
 class FormUpdate(BaseModel):

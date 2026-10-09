@@ -45,7 +45,7 @@ export interface QuestionPatch {
 export const api = {
   forms: () => request<FormSummary[]>("/api/forms"),
   form: (id: number) => request<FormDetail>(`/api/forms/${id}`),
-  createForm: (title = "My new form") => request<FormDetail>("/api/forms", json("POST", { title })),
+  createForm: (title = "New form") => request<FormDetail>("/api/forms", json("POST", { title })),
   updateForm: (id: number, data: { title?: string; theme_id?: number; settings?: Partial<FormSettings> }) =>
     request<FormDetail>(`/api/forms/${id}`, json("PATCH", data)),
   deleteForm: (id: number) => request<void>(`/api/forms/${id}`, { method: "DELETE" }),
