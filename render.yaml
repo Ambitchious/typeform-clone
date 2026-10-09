@@ -1,0 +1,24 @@
+# Render blueprint for the API. The disk keeps the SQLite database and uploaded files
+# across deploys and restarts (Render's free instances have an ephemeral filesystem).
+services:
+  - type: web
+    name: typeform-clone-api
+    runtime: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DATABASE_URL
+        value: sqlite:////var/data/typeform.db
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: CORS_ORIGINS
+        sync: false # set to the Vercel URL, e.g. https://typeform-clone.vercel.app
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1

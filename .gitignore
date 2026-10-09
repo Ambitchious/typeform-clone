@@ -1,0 +1,11 @@
+.DS_Store
+
+# backend
+backend/.venv/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/*.db
+backend/uploads/
+
+# frontend (create-next-app's own .gitignore covers the rest)
+frontend/.env*.local

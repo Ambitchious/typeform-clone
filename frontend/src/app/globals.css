@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Admin (builder/dashboard) colours, measured from admin.typeform.com. */
+:root {
+  --ink: #3c323e;
+  --ink-2: #655d67;
+  --ink-3: #8f8691;
+  --line: rgba(81, 76, 84, 0.15);
+  --surface: #ffffff;
+  --canvas: #f7f7f8;
+  --panel: #f2f1f3;
+  --hover: rgba(60, 50, 62, 0.06);
+  --accent: #0f6e5c;
+}
+.dark {
+  --ink: #f2eef3;
+  --ink-2: #b9b1bb;
+  --ink-3: #8a828c;
+  --line: rgba(255, 255, 255, 0.12);
+  --surface: #1e1a1f;
+  --canvas: #151216;
+  --panel: #241f25;
+  --hover: rgba(255, 255, 255, 0.06);
+  --accent: #3fb59b;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-hover: var(--hover);
+  --color-accent: var(--accent);
+  /* Question-type tiles, measured from Typeform's add-content dialog. */
+  --color-tile-contact: #f8cdd8;
+  --color-tile-choice: #ddd6fa;
+  --color-tile-rating: #c4e3ba;
+  --color-tile-text: #bdddf9;
+  --color-tile-other: #fbe19d;
+  --color-tile-screen: #dedcde;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Respondent form (themed through --tf-* variables) ---------- */
+.tf {
+  background-color: var(--tf-bg);
+  background-size: cover;
+  background-position: center;
+  color: var(--tf-q);
+  font-family: var(--tf-font);
+  --tf-q-soft: color-mix(in srgb, var(--tf-q) 70%, transparent);
+  --tf-a-soft: color-mix(in srgb, var(--tf-a) 55%, transparent);
+  --tf-a-fill: color-mix(in srgb, var(--tf-a) 10%, transparent);
+  --tf-a-fill-hover: color-mix(in srgb, var(--tf-a) 20%, transparent);
+  --tf-a-line: color-mix(in srgb, var(--tf-a) 30%, transparent);
+}
+.tf-input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--tf-a-line);
+  color: var(--tf-a);
+  font-size: 30px;
+  line-height: 1.25;
+  padding: 0 0 8px;
+  outline: none;
+  transition: border-color 0.25s;
+  font-family: inherit;
+}
+.tf-input::placeholder { color: var(--tf-a-soft); opacity: 0.6; }
+.tf-input:focus { border-bottom: 2px solid var(--tf-a); padding-bottom: 7px; }
+.tf-input[type="number"]::-webkit-inner-spin-button { opacity: 0.6; }
+.tf-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  max-width: 100%;
+  padding: 6px 10px 6px 8px;
+  min-height: 44px;
+  border-radius: min(var(--tf-radius), 8px);
+  background: var(--tf-a-fill);
+  box-shadow: inset 0 0 0 1px var(--tf-a-line);
+  color: var(--tf-a);
+  font-size: 18px;
+  text-align: left;
+  transition: background-color 0.25s cubic-bezier(0.215, 0.61, 0.355, 1), box-shadow 0.25s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.tf-choice:hover { background: var(--tf-a-fill-hover); }
+.tf-choice[aria-checked="true"], .tf-choice[data-selected="true"] { box-shadow: inset 0 0 0 2px var(--tf-a); }
+.tf-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--tf-a-soft);
+  background: color-mix(in srgb, var(--tf-bg) 80%, transparent);
+  transition: background-color 0.2s, color 0.2s;
+}
+[aria-checked="true"] > .tf-key { background: var(--tf-a); color: var(--tf-bg); border-color: var(--tf-a); }
+.tf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: min(var(--tf-radius), 20px);
+  background: var(--tf-btn);
+  color: var(--tf-btn-text);
+  font-weight: 700;
+  font-size: 18px;
+  transition: transform 0.15s, filter 0.25s, opacity 0.25s;
+}
+.tf-btn:hover { filter: brightness(1.12); }
+.tf-btn:active { transform: scale(0.98); }
+.tf-btn:disabled { opacity: 0.5; cursor: default; }
+.tf-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  background: rgba(248, 228, 227, 0.95);
+  border: 1px solid rgba(248, 205, 216, 0.9);
+  color: #913b21;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1 } 25%, 75% { opacity: 0.35 } 50% { opacity: 1 } }
+.tf-blink { animation: blink 0.45s ease-in-out; }
