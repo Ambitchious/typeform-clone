@@ -26,6 +26,7 @@ export function DesignPanel({ open, onClose, editor, anchor }: Props) {
   const [original, setOriginal] = useState<Theme | null>(null);
   const [confirm, setConfirm] = useState<null | (() => void)>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [renaming, setRenaming] = useState<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -74,6 +75,15 @@ export function DesignPanel({ open, onClose, editor, anchor }: Props) {
     const copy = await api.createTheme({ ...t, name: `${t.name} (Copy)` });
     setThemes((list) => [...list, copy]);
     toast.success("Theme duplicated");
+  };
+  const rename = async (t: Theme, name: string) => {
+    setRenaming(null);
+    if (!name.trim() || name.trim() === t.name) return;
+    const { id, ...body } = t;
+    const saved = await api.updateTheme(id, { ...body, name: name.trim() }).catch(() => null);
+    if (!saved) return toast.error("Couldn't rename the theme");
+    setThemes((list) => list.map((x) => (x.id === id ? saved : x)));
+    if (current.id === id) editor.setForm((f) => ({ ...f, theme: saved }));
   };
   const remove = async (t: Theme) => {
     try {
@@ -155,9 +165,11 @@ export function DesignPanel({ open, onClose, editor, anchor }: Props) {
                 <div className="grid grid-cols-2 gap-4">
                   {list.map((t) => (
                     <ThemeCard key={t.id} theme={t} selected={t.id === current.id} onApply={() => editor.setTheme(t)}
+                      renaming={renaming === t.id} onRename={(name) => rename(t, name)}
                       menu={[
                         { label: "Edit", onClick: () => edit(t.is_gallery ? { ...t, id: undefined, name: `${t.name} (Copy)` } : t) },
                         ...(t.is_gallery ? [] : [
+                          { label: "Rename", onClick: () => setRenaming(t.id) },
                           { label: "Duplicate", onClick: () => duplicate(t) },
                           { label: "Delete", onClick: () => remove(t), danger: true },
                         ]),
@@ -200,8 +212,9 @@ function Tabs({ items, value, onChange, badge }: { items: [string, string][]; va
   );
 }
 
-function ThemeCard({ theme, selected, onApply, menu }: {
+function ThemeCard({ theme, selected, onApply, menu, renaming, onRename }: {
   theme: Theme; selected: boolean; onApply: () => void; menu: { label: string; onClick: () => void; danger?: boolean }[];
+  renaming?: boolean; onRename?: (name: string) => void;
 }) {
   return (
     <div className={`overflow-hidden rounded-xl bg-surface transition ${selected ? "ring-2 ring-ink" : "ring-1 ring-line hover:ring-ink-3"}`}>
@@ -211,7 +224,11 @@ function ThemeCard({ theme, selected, onApply, menu }: {
         <span className="mt-3 block h-[18px] w-10" style={{ background: "var(--tf-btn)", borderRadius: "min(var(--tf-radius), 4px)" }} />
       </button>
       <div className="flex items-center justify-between px-4 py-3 text-[14px]">
-        <span className="truncate">{theme.name}</span>
+        {renaming ? (
+          <input autoFocus defaultValue={theme.name} aria-label="Theme name" onFocus={(e) => e.target.select()}
+            onBlur={(e) => onRename?.(e.target.value)} onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+            className="min-w-0 flex-1 rounded border border-ink px-1 outline-none" />
+        ) : <span className="truncate">{theme.name}</span>}
         <Menu align="left" items={menu} trigger={(o) => <IconButton icon="more" label={`${theme.name} options`} onClick={o} className="!size-6" />} />
       </div>
     </div>

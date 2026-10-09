@@ -87,6 +87,8 @@ body {
   transition: border-color 0.25s;
   font-family: inherit;
 }
+/* Browser autofill must not paint its own white box and dark text over the theme. */
+.tf-input:-webkit-autofill { -webkit-text-fill-color: var(--tf-a); caret-color: var(--tf-a); transition: background-color 99999s; }
 .tf-input::placeholder { color: var(--tf-a-soft); opacity: 0.6; }
 .tf-input:focus { border-bottom: 2px solid var(--tf-a); padding-bottom: 7px; }
 .tf-input[type="number"]::-webkit-inner-spin-button { opacity: 0.6; }

@@ -44,7 +44,7 @@ export function QuestionView({ question, number, value, onChange = () => {}, onS
       <div className="relative">
         {number !== null && (
           <span aria-hidden className="tf-q-num absolute -left-7 top-[0.45em] grid h-4 min-w-4 place-items-center rounded-[3px] px-[3px] text-[10px] font-bold max-sm:static max-sm:mb-3 max-sm:inline-grid"
-            style={{ background: "var(--tf-q)", color: "var(--tf-bg)" }}>
+            style={{ background: "var(--tf-btn)", color: "var(--tf-btn-text)" }}>
             {number}
           </span>
         )}

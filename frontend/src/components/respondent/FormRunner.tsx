@@ -242,7 +242,7 @@ export function FormRunner({ form, preview = false }: Props) {
         </div>
       )}
 
-      <AnimatePresence mode="wait" custom={state.dir} initial={false} onExitComplete={() => { lockUntil.current = 0; }}>
+      <AnimatePresence mode="wait" custom={state.dir} onExitComplete={() => { lockUntil.current = 0; }}>
         {state.screen === "welcome" && (
           <motion.section key="welcome" custom={1} variants={slide} initial="enter" animate="center" exit="exit"
             className="tf-w flex flex-1 flex-col justify-center px-6 pb-24 sm:px-16 sm:pb-0">
