@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { FormDetail, Question, QuestionType } from "@/lib/types";
+import type { FormDetail, Question } from "@/lib/types";
+import type { Element } from "../questions/registry";
 import { Canvas } from "./Canvas";
 import { ConnectPanel } from "./ConnectPanel";
 import { DesignPanel } from "./DesignPanel";
@@ -20,9 +21,11 @@ export function Builder({ initial, tab, focusQuestion }: { initial: FormDetail; 
   const [designAnchor, setDesignAnchor] = useState<HTMLElement | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(true);
 
-  const add = (type: QuestionType) => {
+  const add = (e: Element) => {
     setModal(null);
-    editor.addQuestion(type);
+    if (e.type) return editor.addQuestion(e.type);
+    if (e.action === "welcome") editor.updateForm({ settings: { welcome: { ...editor.form.settings.welcome, enabled: true } } });
+    editor.setSelected(e.action!);
   };
 
   return (

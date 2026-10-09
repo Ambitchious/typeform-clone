@@ -23,16 +23,36 @@ export const TYPES: Record<QuestionType, TypeInfo> = {
   file_upload: { label: "File Upload", icon: "upload", tile: "bg-tile-other", group: "Other", autoAdvance: false },
 };
 
-/** Shown in the add-content dialog but not buildable — the brief's "Coming soon" items. */
-export const COMING_SOON: { label: string; icon: IconName; tile: string; group: TypeInfo["group"] }[] = [
-  { label: "Phone Number", icon: "phone", tile: "bg-tile-contact", group: "Contact info" },
-  { label: "Picture Choice", icon: "eye", tile: "bg-tile-choice", group: "Choice" },
-  { label: "Opinion Scale", icon: "chart", tile: "bg-tile-rating", group: "Rating & ranking" },
-  { label: "Ranking", icon: "longText", tile: "bg-tile-rating", group: "Rating & ranking" },
-  { label: "Video and Audio", icon: "play", tile: "bg-tile-text", group: "Text & Video" },
-  { label: "Date", icon: "clock", tile: "bg-tile-other", group: "Other" },
-  { label: "Payment", icon: "lock", tile: "bg-tile-other", group: "Other" },
-  { label: "Signature", icon: "file", tile: "bg-tile-other", group: "Other" },
+/** Everything in Typeform's "Add form elements" dialog, in its order and columns. Entries with a `type`
+ *  (or a screen `action`) are built; the rest are the brief's "Coming soon" placeholders. */
+export interface Element {
+  label: string;
+  icon: IconName;
+  tile: string;
+  type?: QuestionType;
+  action?: "welcome" | "end";
+  premium?: boolean; // Typeform marks these as paid
+}
+const contact = (label: string, icon: IconName, type?: QuestionType): Element => ({ label, icon, tile: "bg-tile-contact", type });
+const choice = (label: string, icon: IconName, type?: QuestionType): Element => ({ label, icon, tile: "bg-tile-choice", type });
+const rating = (label: string, icon: IconName, type?: QuestionType): Element => ({ label, icon, tile: "bg-tile-rating", type });
+const text = (label: string, icon: IconName, type?: QuestionType, premium = false): Element => ({ label, icon, tile: "bg-tile-text", type, premium });
+const other = (label: string, icon: IconName, type?: QuestionType, premium = false): Element => ({ label, icon, tile: "bg-tile-other", type, premium });
+const screen = (label: string, icon: IconName, action?: Element["action"], premium = false): Element => ({ label, icon, tile: "bg-tile-screen", action, premium });
+
+export const CATALOGUE: { title?: string; items: Element[] }[][] = [
+  [
+    { title: "Contact info", items: [contact("Contact Info", "contact"), contact("Email", "email", "email"), contact("Phone Number", "phoneCall"), contact("Address", "pin"), contact("Website", "link")] },
+    { title: "Text & Video", items: [text("Long Text", "longText", "long_text"), text("Short Text", "shortText", "short_text"), text("Video and Audio", "videoBox", undefined, true), text("Clarify with AI", "clarify", undefined, true), text("FAQ with AI", "faq", undefined, true)] },
+  ],
+  [
+    { title: "Choice", items: [choice("Multiple Choice", "choice", "multiple_choice"), choice("Dropdown", "dropdown", "dropdown"), choice("Picture Choice", "image"), choice("Yes/No", "yesNo", "yes_no"), choice("Legal", "legal"), choice("Checkbox", "checkbox")] },
+    { title: "Other", items: [other("Number", "number", "number"), other("Date", "calendar"), other("Signature", "signature", undefined, true), other("Payment", "card", undefined, true), other("File Upload", "fileUp", "file_upload", true), other("Scheduler", "scheduler")] },
+  ],
+  [
+    { title: "Rating & ranking", items: [rating("Net Promoter Score®", "gauge"), rating("Opinion Scale", "chart"), rating("Rating", "star", "rating"), rating("Ranking", "ranking"), rating("Matrix", "matrix")] },
+    { items: [screen("Welcome Screen", "welcome", "welcome"), screen("Partial Submit Point", "funnel", undefined, true), screen("Statement", "quote"), screen("Question Group", "group"), screen("End Screen", "end", "end"), screen("Redirect to URL", "redirect", undefined, true)] },
+  ],
 ];
 
 export const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

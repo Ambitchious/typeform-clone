@@ -59,8 +59,10 @@ export function Toggle({ checked, onChange, label, hint }: { checked: boolean; o
   );
 }
 
-export function Modal({ open, onClose, title, children, footer, width = 440 }: {
+export function Modal({ open, onClose, title, children, footer, width = 440, bare = false }: {
   open: boolean; onClose: () => void; title?: string; children: ReactNode; footer?: ReactNode; width?: number;
+  /** Render children edge to edge, with no title, padding or close button. */
+  bare?: boolean;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -78,9 +80,13 @@ export function Modal({ open, onClose, title, children, footer, width = 440 }: {
             transition={{ duration: 0.18, ease: [0.215, 0.61, 0.355, 1] }}
             className="relative flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-2xl bg-surface shadow-[0_0_0_3px_rgba(84,80,88,0.09),0_24px_48px_rgba(0,0,0,0.18)]"
             style={{ maxWidth: width }}>
-            {title && <h2 className="px-8 pt-8 text-[21px] text-ink">{title}</h2>}
-            <IconButton icon="x" label="Close" onClick={onClose} className="absolute right-4 top-4" />
-            <div className="overflow-y-auto px-8 pb-6 pt-4">{children}</div>
+            {bare ? children : (
+              <>
+                {title && <h2 className="px-8 pt-8 text-[21px] text-ink">{title}</h2>}
+                <IconButton icon="x" label="Close" onClick={onClose} className="absolute right-4 top-4" />
+                <div className="overflow-y-auto px-8 pb-6 pt-4">{children}</div>
+              </>
+            )}
             {footer && <div className="flex justify-end gap-2 bg-canvas px-8 py-3">{footer}</div>}
           </motion.div>
         </motion.div>
